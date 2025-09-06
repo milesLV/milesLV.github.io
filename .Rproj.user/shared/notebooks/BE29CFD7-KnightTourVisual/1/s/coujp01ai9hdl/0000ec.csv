@@ -1,3 +1,0 @@
-"0","plot_knight_from_matrix(c(6,5), A, 7, 8, exponent = 40, showPathsToExponent = TRUE)
-"
-"2","Warning: The working directory was changed to /Users/miles5 inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks."

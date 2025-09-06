@@ -1,14 +1,3 @@
----
-title: "Knight's Tour Adjacency Matrix Visual"
-author: "Miles Libbey V"
-format: html
-image: knightTourIcon.png
-categories:
-  - Self-Directed
-  - R
----
-
-```{r, "Imports", include=FALSE}
 library(tidyverse)
 library(Matrix)
 library(purrr)
@@ -18,17 +7,14 @@ library(ggplot2)
 library(stringr)
 library(shiny)
 library(rsconnect)
-library(shinylive)
-library(httpuv)
 
 '%notin%' <- Negate('%in%')
-```
 
-```{r, "Custom Helper Functions", include=FALSE}
+
 generate_combinations <- function(ops, nums) {
   # Convert to numeric if character
   nums <- as.numeric(nums)
-
+  
   # Generate all permutations of numbers
   permute <- function(v) {
     if (length(v) == 1) return(list(v))
@@ -41,7 +27,7 @@ generate_combinations <- function(ops, nums) {
     }
     return(out)
   }
-
+  
   # Parse operations into functions
   parse_op <- function(op_string) {
     if (op_string == "+") {
@@ -58,18 +44,18 @@ generate_combinations <- function(ops, nums) {
       stop(paste("Unknown operation:", op_string))
     }
   }
-
+  
   # Convert all ops to functions
   op_funcs <- lapply(ops, parse_op)
-
+  
   # Get all combinations of operations (each element gets an op)
   op_combos <- expand.grid(rep(list(seq_along(op_funcs)), length(nums)))
   
   # Generate number permutations
   num_perms <- permute(nums)
-
+  
   result <- list()
-
+  
   for (perm in num_perms) {
     for (i in 1:nrow(op_combos)) {
       indices <- as.integer(op_combos[i, ])
@@ -78,7 +64,7 @@ generate_combinations <- function(ops, nums) {
       result <- append(result, list(transformed))
     }
   }
-
+  
   return(result)
 }
 
@@ -98,7 +84,7 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
   if (!ifValid(position)) {
     stop("Please enter values within board dimensions")
   }
-
+  
   movesList <- lapply(generate_combinations(c("+", "-"), c(1, 2)), function(a){
     newPosition <- c(position[1] + a[1], position[2] + a[2])
     if (ifValid(newPosition)) {
@@ -112,9 +98,7 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
 }
 
 makeKnightMoves(c(8,7), c(8,7))
-```
 
-```{r, "Making Lattice Adjacency Matrix", include=FALSE}
 #1\space\space\space\space 2\space\space\space\space3\space\space\space\space4\\
 makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
   cellTotal <- numRow * numCol
@@ -143,11 +127,9 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
   # return(as(A, "sparseMatrix"))
   return(A)
 }
-```
 
-```{r, "Actual Plot", include=FALSE}
 plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, exponent = 1, showPathsToExponent = FALSE, probability = FALSE) {
-
+  
   if (length(position) != 2 || 
       !all(position >= 1) || 
       position[1] > nrows || 
@@ -167,11 +149,11 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
   } else {
     A <- A %^% exponent # exponentiating
   }
-
+  
   # Convert origin to matrix index
   origin_index <- (position[1] - 1) * ncols + position[2]
   path_counts <- A[origin_index, ]
-
+  
   # Map index → coordinates
   grid <- expand.grid(x = 1:ncols, y = 1:nrows)
   grid$index <- (grid$y - 1) * ncols + grid$x
@@ -187,17 +169,17 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
     mutate(numDigits = ifelse(str_detect(paths, "^0\\."), 
                               nchar(paths) - 3,
                               nchar(paths)),
-      pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
-                              format(signif(paths, 3), scientific = TRUE), 
-                              paths))
-             
+           pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
+                                   format(signif(paths, 3), scientific = TRUE), 
+                                   paths))
+  
   # Label the origin
   grid$Type <- ifelse(grid$index == origin_index, "Origin", "Other")
   origin_tile <- grid %>% filter(Type == "Origin")
   
   knightImage <- png::readPNG("knightImage.png")
   knightGrob <- rasterGrob(knightImage, interpolate = TRUE)
-
+  
   readable = 16
   # Plot
   ggplot(grid, aes(x = x, y = y, fill = paths)) +
@@ -219,7 +201,7 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
                             ifelse(grid$numDigits > cutOff, 
                                    4, 
                                    4.5))
-              ) +
+    ) +
     coord_fixed() +
     labs(title = str_c("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
     guides(fill = guide_colorbar(barwidth = 25, barheight = 3)) + 
@@ -234,16 +216,10 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
           plot.title = element_text(size = readable+5, margin = margin(b = -10)),
           legend.text = element_text(size = readable-1),
           legend.title = element_text(size = readable+2)
-          )
+    )
 }
 # plotKnightFromMatrix(c(6,5), 8, 6, exponent = 1, showPathsToExponent = TRUE, probability = TRUE)
-```
 
-Below you will find a Shiny App made for fun using concepts learned in *Linear Algebra* and *Computational Linear Algebra*, most notably graphs, adjacency matrices, matrix exponentiation. All of the concepts used to build the app are explained from an introductory level if you are interested in learning what is going on behind the scenes.
-
-## Shiny App
-
-```{r, "Shiny App"}
 ui <- fluidPage(
   sidebarLayout( # all of the input bars
     sidebarPanel(
@@ -392,118 +368,3 @@ server <- function(input, output, session) {
 
 # Run the application
 shinyApp(ui = ui, server = server)
-```
-
-
-## The Math Behind the App
-
-### Adjacency Matrices
-
-An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:
-
-![](images/graphExample-01.png){.lightbox fig-align="center" width="226"}
-
-The matrix shows which vertices are adjacent to one another and which are not. It can be thought of as this: rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and a 0 is placed if not.
-
-$$
-A =
-\begin{bmatrix}
-0 & 1 & 0 & 1 \\
-1 & 0 & 0 & 1 \\
-0 & 0 & 0 & 1 \\
-1 & 1 & 1 & 0 \\
-\end{bmatrix}
-$$
-
-For example, in our graph, 2 and 4 are connected, so if you look in the 2nd row (the starting place) and then look at the 4th row (the ending place), you will see that there is a 1. Vice versa, if you look at $A_{2,3}$ you will see that it is a 0, meaning 2 and 3 are unconnected, which can be confirmed from looking at the graph. These types of matrices are always square $n \times n$ matrices because it just the same vertices being shown in the both and rows and columns. How this relates to a knight is if you imagine the 64 squares on a chess board as vertices, we can graph the connecting vertices to show what the knight can make in one move (later on we will be able to show multiple moves, but we are not there yet).
-
-However, chess squares have defined places where they are. In this graph, 1 can be put to the right of 4 and it wouldn't matter, as seen below.
-
-![There is not difference between this graph and the one before, it will have the same adjacency matrix](images/graphExample2-01.png){.lightbox fig-align="center" width="324"}
-
-### Lattice Adjacency Matrices
-
-We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a [Lattice graph](https://en.wikipedia.org/wiki/Lattice_graph) is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each squares is distinct and has 2-dimensional coordinates (i.e. the point (1,2) has an x dimension and a y dimension).
-
-$$
-\begin{gather*}
-\begin{bmatrix} 
-(1,1) & (1,2) & (1,3) \\
-(2,1) & (2,2) & (2,3) \\
-(3,1) & (3,2) & (3,3) \\
-\end{bmatrix} \\
-\text{Lattice Matrix}
-\end{gather*}
-$$
-
-Just as we made a adjacency matrix out of a normal graph, we can make a lattice adjacency matrix out of a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix is representative of a lattice point (i.e. $A_{1,1} \text{ is representative of the lattice point } (1,1)$).
-
-In order to make a lattice adjacency matrix given $n \times n$ lattices, we will essentially construct a $n^2 \times n^2$ matrix. This comes from exactly what we did with the adjacency matrices; every single node was put across horizontally and vertically in order to have every pairs of connections between the nodes. Just in this case, since our grid has $n \times n = n^2$ lattices, it will be much larger. Essentially what we're doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer-product of 2 of long vectors.
-
-$$
-\begin{gather*}
-  \begin{bmatrix}
-  1 & 2 & 3 \\
-  4 & 5 & 6 \\
-  7 & 8 & 9 \\
-  \end{bmatrix}
-  \longrightarrow 
-  \begin{bmatrix}
-  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\ \end{bmatrix} 
-  \longrightarrow
-  \begin{bmatrix}
-  &1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
-  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\
-  \end{bmatrix} \\
-  \space\space\text{Lattice}\space\space\space\space\space\space\space\text{Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{2D Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space
-\end{gather*}
-$$
-
-### Making the Lattice Adjacency Matrix
-
-Now that the matrix is made, we can use the 2D to 1D conversion formula: $(\text{row} -1) \times \text{row length} + \text{column}$. This helps streamline the process of actually assigning what squares are adjacent to one another when a knight jumps. For every single cell, we can just calculate the knight moves with a helper function and then assign them a 1 or 0 if they are adjacent.
-
-The end result looks like this:
-
-```{r, "Image", echo=FALSE}
-image(makeLatticeAdjMatrix())
-```
-
-Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, which we can see clearly using the matrix $A$ from before and making $A^2$ and zooming in on the results of node 2:
-
-$$
-\begin{equation*}
-\begin{gathered}
-  A =
-  \begin{bmatrix}
-  0 & 1 & 0 & 1 \\
-  1 & 0 & 0 & 1 \\
-  0 & 0 & 0 & 1 \\
-  1 & 1 & 1 & 0 \\
-  \end{bmatrix}
-  \\[1em]
-  A \times A =
-  \begin{bmatrix}
-  \cdot & \color{red}{(0 \cdot 1) + (1 \cdot 0) + (0 \cdot 0) + (1 \cdot 1)} & \cdot & \cdot \\
-  \cdot & \color{red}{(1 \cdot 1) + (0 \cdot 0) + (0 \cdot 0) + (1 \cdot 1)} & \cdot & \cdot \\
-  \cdot & \color{red}{(0 \cdot 1) + (0 \cdot 0) + (0 \cdot 0) + (1 \cdot 1)} & \cdot & \cdot \\
-  \cdot & \color{red}{(1 \cdot 1) + (1 \cdot 0) + (1 \cdot 0) + (0 \cdot 1)} & \cdot & \cdot \\
-  \end{bmatrix}
-  =
-  \begin{bmatrix}
-  \cdot & \color{red}{1} & \cdot & \cdot \\
-  \cdot & \color{red}{2} & \cdot & \cdot \\
-  \cdot & \color{red}{1} & \cdot & \cdot \\
-  \cdot & \color{red}{1} & \cdot & \cdot \\
-  \end{bmatrix}
-  \\[1em]
-  \begin{array}{c c l}
-    \textbf{Start} & \textbf{Count} & \textbf{Explanation} \\
-    1 & 1 & \text{1 path from node 1 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (1 → 4 → 2) \\
-    2 & 2 & \text{2 paths from node 2 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (2 → 1 → 2), (2 → 4 → 2) \\
-    3 & 1 & \text{1 path from node 3 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (3 → 4 → 2) \\
-    4 & 1 & \text{1 path from node 4 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (4 → 1 → 2) \\
-    \end{array}
-\end{gathered}
-\end{equation*}
-$$
