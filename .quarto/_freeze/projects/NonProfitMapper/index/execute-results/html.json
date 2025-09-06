@@ -1,0 +1,17 @@
+{
+  "hash": "ae37cdd34df2009bb6f0e89c9d6d2ef6",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Nonprofit Leaflet\"\nauthor: \"Miles Libbey V\"\nformat: html\neditor: visual\ncategories: \n  - Self-Directed\n  - R\n  - GraphQL\n---\n\n\n\n\n# Nonprofit Mapper\n\n\n\n\n\n\n::: {.cell}\n\n:::\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,0 +1,69 @@
+"0","tedsd_2021 %>%
+  # mutate(LOS = as.numeric(LOS)) %>% # Optional For Grouping LOS together
+  #   mutate(LOS = cut(
+  #   LOS,
+  #   breaks = c(0, 30, 35, 37),
+  #   labels = c(""< 30 days"", ""30-180 days"", ""181 - 365+ days""),
+  #   include.lowest = TRUE,
+  #   right = TRUE
+  # )) %>%
+  mutate(LOS = case_when(
+    LOS %in% 1:30 ~ ""< 30 days"",
+    LOS == 31 ~ ""31-45 days"",
+    LOS == 32 ~ ""46-60 days"",
+    LOS == 33 ~ ""61-90 days"",
+    LOS == 34 ~ ""91-120 days"",
+    LOS == 35 ~ ""121-180 days"",
+    LOS == 36 ~ ""181-365 days"",
+    LOS == 37 ~ ""365+ days""
+    )
+  ) %>%
+  # mutate(LOS = factor(LOS, levels = c(""< 30 days"", ""30-180 days"", ""181 - 365+ days""))) %>% #Optional for Grouping LOS together
+  mutate(LOS = factor(LOS, levels = c(""< 30 days"", ""31-45 days"", ""46-60 days"", ""61-90 days"", ""91-120 days"", ""121-180 days"", ""181-365 days"", ""365+ days""))) %>%
+  group_by(LIVARAG, LOS, LIVARAG_D) %>%
+  summarize(count = n(), .groups = 'drop') %>%
+  group_by(LIVARAG, LOS) %>%
+  mutate(total = sum(count)) %>%
+  ungroup() %>%
+  mutate(percentage = count / total * 100) %>% 
+    mutate(LIVARAG_delta = case_when( #conditions on how housing changes from admission to discharge
+    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Unhoused"" ~ ""Didn't Change Housing"",
+    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Dependent Living"" ~ ""Went into Dependent Living"",
+    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Independent Living"" ~ ""Went into Independent Living"",
+    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Unhoused"" ~ ""Became Unhoused"",
+    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Dependent Living"" ~ ""Didn't Change Housing"",
+    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Independent Living"" ~ ""Went into Independent Living"",
+    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Unhoused"" ~ ""Became Unhoused"",
+    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Dependent Living"" ~ ""Went into Dependent Living"",
+    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Independent Living"" ~ ""Didn't Change Housing""
+    )
+  ) %>%
+  mutate(LIVARAG_delta = factor(LIVARAG_delta, levels = c(""Didn't Change Housing"", ""Became Unhoused"",
+        ""Went into Dependent Living"", ""Went into Independent Living""))
+  ) %>%
+  mutate(LIVARAG = recode(LIVARAG, #adding returns for readability / aesthetics
+    ""Unhoused"" = ""Admitted as Unhoused"",
+    ""Dependent Living"" = ""Admitted as Living Dependently"",
+    ""Independent Living"" = ""Admitted as Living Independently"",
+    ),
+    LIVARAG = factor(LIVARAG, levels = c(""Admitted as Unhoused"", ""Admitted as Living Dependently"", ""Admitted as Living Independently""))
+  ) %>%
+  ggplot(aes(x = LOS, y = percentage, fill = LIVARAG_delta)) +
+    geom_bar(stat = ""identity"", position = ""stack"") +
+    facet_wrap(~LIVARAG, ncol = 1, scales = ""free_y"") +
+    scale_fill_manual(values = c(""#0072B2"", graphBlue, graphGreen, graphOrange)) +
+    labs(title = ""Change in Clients' Housing Situation by Admitted Living Arrangement and Length of Stay"",
+         x = ""Length of Stay (Above 30 days)"",
+         y = ""Percentage of Clients (%)"",
+         fill = ""Change in Housing Status"") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12), 
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16), 
+          plot.title = element_text(size = 16, face = ""bold""),
+          strip.text = element_text(size = 14),
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 13))
+"
+"2","Warning: The working directory was changed to /Users/miles5 inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks."

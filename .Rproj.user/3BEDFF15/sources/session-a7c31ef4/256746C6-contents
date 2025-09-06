@@ -1,0 +1,207 @@
+---
+title: "Scraping"
+subtitle: "HW8 Part 1"
+author: "Miles Libbey"
+format: 
+  html:
+    self-contained: true
+---
+
+# Instructions
+
+Complete all parts of the Exercises section below to earn a High Pass for this challenge.
+
+**Requirements for high passing:**
+
+Ex 1
+
+- Have a correct answer to who can scrape that data based on the information in robots.txt
+
+Ex 2
+
+- Write a description of what `httr_attr()` does
+- Include a code example to demonstrate what it does
+
+Ex 3
+
+- Code should result in 2044 rows and 3 columns of data about cheese
+- Code should result in unique information about name, url, and whether or not it has an image
+- Code should include Sys.sleep(1) to not overtax website
+
+
+Ex 4
+
+- Code should result in 10 rows and 6 columns of data about 10 cheeses
+- Code should result in unique information about cheese identifier (name or url), milk, country, family, type, flavor
+- Code should include Sys.sleep(1) to not overtax website
+
+**Submission:** Click the "Render" button in RStudio to knit a self-contained HTML with all images embedded. Commit and push changes to this file as well as the generated HTML. Push your changes to GitHub by the deadline. (GitHub classroom automatically creates a pull request for receiving feedback.)  Note that your submission is incomplete without a **readable, rendered HTML** in addition to the qmd file. Please be sure that any code output you want graded is clearly printed in the HTML. 
+
+
+## Exercises
+
+**Goal:** Scrape information from <https://www.cheese.com> to obtain a dataset of characteristics about different cheeses, and gain deeper insight into your coding process.
+
+
+
+**Ex 1:** Locate and examine the `robots.txt` file for <https://www.cheese.com>. Summarize (in words) what you learn from the cheese.com `robots.txt` file.
+
+https://www.cheese.com/robots.txt doesn't specifically who can and cannot use it, instead giving everyone permission because all User-Agents are able to access it. Nor does it specify where specifically is allowed, just giving a blanket view of the site map. From this, any User Agent is allowed to access anything on the site.
+
+
+**Ex 2:** Learn about the `html_attr()` function from `rvest`. Describe how this function works, and give a small code example to illustrate how it works.
+
+
+
+```{r}
+library(rvest)
+cheese <- read_html("https://www.cheese.com/")
+
+cheese %>% 
+  html_elements("#top-menu li:nth-child(6) a") %>%
+  html_attr("href")
+attributes
+
+```
+
+
+**Ex 3:** Obtain the following information for **all** cheeses in the alphabetical database <https://www.cheese.com/alphabetical/>:
+
+- Cheese name
+- URL for the cheese's webpage (e.g., <https://www.cheese.com/gouda/>)
+- Whether or not the cheese has a picture (e.g., [gouda](https://www.cheese.com/gouda/) has a picture, but [bianco](https://www.cheese.com/bianco/) does not)
+
+To be kind to the website owners, please add a 1 second pause between page queries. (Note that you can view 100 cheeses at a time.)
+
+
+```{r}
+# Load required libraries
+library(rvest)
+library(dplyr)
+library(stringr)
+library(tibble)
+
+# Define the URL
+url <- "https://www.cheese.com/alphabetical/?per_page=100"
+
+# Read the HTML content from the webpage
+webpage <- read_html(url)
+
+# Extract the cheese names and URLs
+goudanoughScraper <- function(url) {
+    Sys.sleep(1.5) # curd-esy pause
+  
+    webpage <- read_html(url)
+    cssSelector <- "h3 a"
+    
+    cheeseNames <- webpage %>% 
+      html_elements(cssSelector) %>% 
+      html_text() # names
+  
+    cheeseURLS <- str_c("https://cheese.com", 
+                        webpage %>% 
+                          html_elements(cssSelector) %>% 
+                          html_attr("href")
+                        ) # complete urls
+
+    cheeseImageLogical <- !str_detect(webpage %>% 
+                                       html_elements("#main-body img") %>% 
+                                       html_attr("src"), 
+                                     "/static/common/img/icon-cheese-default.e8052fdfc02e.svg" 
+                                      # if has default, missing, image or not
+                                     )
+    
+    return(tibble(cheeseName = cheeseNames,
+                  urls = cheeseURLS,
+                  imageExists = cheeseImageLogical
+                  )
+           )
+}
+
+# Create a data frame to store the results
+
+urls_all_pages <- c(url, str_c(url, "&page=", 2:21))
+cheeseInfoRaw <- purrr::map(urls_all_pages, goudanoughScraper)
+cheese_df <- bind_rows(cheeseInfoRaw)
+```
+
+Print the dimensions & first few rows of your final data frame:
+
+```{r}
+dim(cheese_df)
+head(cheese_df)
+```
+
+
+
+**Ex 4:** When you go to a particular cheese's page (like [gouda](https://www.cheese.com/gouda/)), you'll see more detailed information about the cheese. For **just 10** of the cheeses in the database, obtain the following detailed information: milk information, country of origin, family, type, and flavour. (Just 10 to avoid overtaxing the website. Continue adding a 1 second pause between page queries.) 
+
+```{r}
+theChosenCheeses <- c("Gouda", "Pecorino Romano", "Brie", "American Cheese", "Cheddar", "Colby", "Bella Lodi", "Burgos", "Point Reyes Bay Blue", "Smoked Goat")
+
+brielliance <- function(cheese) {
+Sys.sleep(1.5)
+  cheeseUpdated <- tolower(str_replace_all(cheese, "\\s","-"))
+  url <- str_c("https://www.cheese.com/", cheeseUpdated)
+  webpage <- read_html(url)
+  
+  cheeseSource <- webpage %>%
+    html_element(".summary_milk p") %>%
+    html_text2() %>%
+    str_extract("from\\s(.*)",1)
+  
+  cheeseCountry <- webpage %>%
+    html_element(".summary_country p") %>%
+    html_text2() %>%
+    str_extract("origin. (.*)",1)
+  
+  cheeseFamily <- webpage %>%
+    html_element(".summary_family p") %>%
+    html_text2() %>%
+    str_extract("Family: (.*)",1)
+  
+  cheeseType <- webpage %>%
+    html_element(".summary_moisture_and_type p") %>%
+    html_text2() %>%
+    str_extract("Type: (.*)",1)
+  
+  cheeseFlavour <- webpage %>%
+    html_element(".summary_taste p") %>%
+    html_text2() %>%
+    str_extract("Flavour: (.*)",1)
+  
+  return(
+          tibble(cheeseName = cheese,
+                url = url,
+                cheeseSource = cheeseSource,
+                cheeseCountry = cheeseCountry,
+                cheeseFamily = cheeseFamily,
+                cheeseType = cheeseType,
+                cheeseFlavour = cheeseFlavour
+                )
+)
+}
+bigCheeseInfo <- purrr::map(theChosenCheeses, brielliance)
+cheeseInfo_df <- bind_rows(bigCheeseInfo)
+```
+
+Print the dimensions & first few rows of your final data frame:
+
+```{r}
+dim(cheeseInfo_df)
+head(cheeseInfo_df)
+```
+
+
+# Resources Reflection (required)
+
+What resources did you use to help with this assignment? Please list below. Then write 3-5 sentence reflection on which resources were most helpful in finishing this task.
+
+**Resources:**
+
+1. 15-scraping-notes.qmd
+2.
+3.
+
+**Reflection:**
+This was a very smooth assignment, there weren't any major hiccups or roadblocks, all of the errors I encountered were easy to fix. The only thing that somewhat delayed me was that I thought of making a helper function for all of the webpage %>% html_element(element) %>% html_text2() html_attr(attr), but that was it.

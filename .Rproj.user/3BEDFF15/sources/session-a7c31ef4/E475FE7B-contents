@@ -1,0 +1,243 @@
+---
+title: "DataScienceFinalProject"
+author: "Miles Libbey"
+date: "2023-11-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r cars}
+library(tidyverse)
+library(ggplot2)
+library(leaflet)
+library(dplyr)
+library(stringr)
+library(readxl)
+library(shiny)
+library(geojsonio)
+library(zoo)
+library(plotly)
+price <- read_csv("~/Desktop/College/COMP_STAT_112/FinalProject/price.csv")
+pricepersqft <- read_csv("~/Desktop/College/COMP_STAT_112/FinalProject/pricepersqft.csv")
+#countyData <- read_excel("COMP_STAT_112/FinalProject/MetroVsMicro.xlsx")
+# uscities <- read_csv("Desktop/College/COMP_STAT_112/FinalProject/uscities.csv")
+#states <- geojsonio::geojson_read("https://gist.github.com/sdwfrost/d1c73f91dd9d175998ed166eb216994a.js", what = "sp")
+```
+By what magnitude has rent changed over the length of 6 years (2011 - 2017) and what is the ratio of magnitudes of metropolitan vs. non-metropolitan
+```{r}
+# countyData <- countyData %>%
+#   separate(`Aguadilla-Isabela, PR Metro Area`, into = c("City", "State"), sep = ", ") %>%
+#   separate(State, into = c("State", "MetroLogical", sep = " "))
+# price <- price %>%
+#   inner_join(countyData)
+```
+
+```{r}
+price %>%
+  mutate(MetroLogical = if_else(`Population Rank` < 1027, "Metro", "Micro")) %>%
+  group_by(MetroLogical) %>%
+  summarize(mean = mean((`January 2016` + `February 2016` + `March 2016` + `April 2016` + `May 2016` + `June 2016` + `July 2016` + `August 2016` + `September 2016` + `October 2016` + `November 2016` + `December 2016`)/ (`January 2011` + `February 2011` + `March 2011` + `April 2011` + `May 2011` + `June 2011` + `July 2011` + `August 2011` + `September 2011` + `October 2011` + `November 2011` + `December 2011`), na.rm = TRUE))
+
+pricepersqft %>%
+  filter(City == Metro & `Population Rank` > 1027) %>%
+  group_by(State) %>%
+  summarize(n = n()) %>% 
+  ggplot(aes(x = fct_reorder(State, desc(n)), y = n)) +
+    geom_col(fill = "lightblue") + 
+    labs(x = "State", y = "Number of Metropolitan Areas") + 
+    ggtitle("Number of Metropolitan Areas by State") + 
+    theme(axis.text.x = element_text(angle = 70, hjust = 1))
+
+pricepersqft %>%
+  mutate(metroLogical = if_else(City == Metro & `Population Rank` > 1027, "Metro", "Micro")) %>%
+  group_by(State, metroLogical) %>%
+  summarize(n = n(metroLogical) / n())
+```
+
+
+```{r}
+# price %>%
+#   mutate(region = case_when(
+#     State %in% c("WA","ID", "MT", "OR", "WY","CA", "NV", "UT", "CO", "AK", "HI") ~ "West",
+#     State %in% c("AZ", "NM", "TX", "OK") ~ "SouthWest",
+#     State %in% c("ND", "MN", "WI", "MI", "SD", "IA", "IL", "IN", "OH", "NE", "KS", "MO") ~ "Midwest",
+#     State %in% c("WV", "DC", "DE", "MD", "VA", "KY", "TN", "NC", "AR", "MS", "AL", "GA", "SC", "LA", "FL") ~ "SouthEast",
+#     State %in% c("NY", "VT", "NH", "ME", "PA", "MD", "NJ", "CT", "RI", "MA") ~ "NorthEast",
+#     TRUE ~ "AAA"
+#   )) %>% 
+#   group_by(region) %>%
+#   summarize(max = max(`January 2017` / `January 2011`, na.rm = TRUE))
+```
+
+```{r}
+# capitals <- left_join(StateCapitals, price)
+# capitals <- capitals %>%
+#   mutate(cityState = str_c(City, ", ", StateName)) %>%
+#   na.omit()
+```
+
+```{r}
+# capitals %>%
+#   filter(State == "MN") 
+
+pricepersqft %>% select(-`City Code`, -Metro,-`Population Rank`) %>% View()
+
+county_price <- pricepersqft %>% 
+  #filter(!rowSums(is.na(select(., `November 2010`:`December 2016`))) > 0) %>%
+  group_by(State) %>%
+  summarise_at(vars(matches("^January|^December")), ~ mean(., na.rm = TRUE)) %>% 
+  mutate(year2011 = `December 2011` - `January 2011`,
+         year2012 = `December 2012` - `January 2012`,
+         year2013 = `December 2013` - `January 2013`,
+         year2014 = `December 2014` - `January 2014`,
+         year2015 = `December 2015` - `January 2015`,
+         year2016 = `December 2016` - `January 2016`) 
+
+#diff_columns <- state_price[, c("year2011", "year2012", "year2013", "year2014", "year2015", "year2016")]
+
+#diff_rows <- pivot_longer(diff_columns, "year2011":"year2016" , names_to = "Year", values_to = "Monthly_Rent_Change")
+```
+
+```{r}
+antijoin <- uscities %>%
+  rename("City" = city, "County" = county_name, "State" = state_id) %>%
+  anti_join(pricepersqft)
+
+antijoin %>%
+  # mutate(populationCat = cut(population, 100, include.lowest = TRUE)) %>%
+  # group_by(populationCat) %>%
+  # summarize(n = n()) %>%
+  ggplot(aes(x = density, y = 1)) + 
+    geom_boxplot(color = "seagreen", outlier.color = "coral") +
+    labs(x = "Population Density (Total per square mile)", y = "") + 
+    ggtitle("Population Density of Excluded Counties") + 
+    geom_text(aes(x = 1400, y = 1.4, label = "Q3 = 393.8"), size = 3.5) + 
+    geom_text(aes(x = 27700, y = 1.05, label = "Manhattan, NY"), size = 3.5) + 
+    geom_text(aes(x = 15500, y = 1.05, label = "Brooklyn, NY"), size = 3.5) + 
+    geom_text(aes(x = 13250, y = 0.965, label = "Bronx, NY"), size = 3.5) + 
+    geom_text(aes(x = 10800, y = 1.05, label = "Isla Vista, CA"), size = 3.5)
+```
+
+```{r}
+missing_percentage_sqft <- colMeans(is.na(pricepersqft)) * 100
+
+colMissing <- data.frame(
+  months = names(price),
+  missing_Percentage_Sqft = missing_percentage_sqft
+)
+
+onlyDates <- colMissing[9:80, ]
+onlyDates %>%
+  mutate(months = my(months)) %>%
+  ggplot(aes(x = months, y = missing_Percentage_Sqft)) +
+    geom_point() + 
+    labs(x = "Months (January 2011 to December 2016)", y = "Percentage of Missing Entries") + 
+    ggtitle("Percentage of Missing Datapoints in Dataset by Month")
+```
+  
+```{r}
+popUp <- pricepersqft %>%
+  filter(!(is.na(`January 2011`))) %>%
+  group_by(State) %>%
+  summarize(numCities = min(n()), mean = mean(`January 2012`))
+
+# result_data <- pricepersqft %>%
+#   select(. -Metro, -`Population Rank`, -`City Code`)
+#   filter(!is.na(`January 2012`)) %>%
+#   pivot_longer(cols = -c(State, City), names_to = "Year_Month", values_to = "Value") %>%
+#   separate(Year_Month, into = c("Month", "Year"), sep = " ", convert = TRUE) %>%
+#   group_by(State, Year) %>%
+#   summarize(numCities = n(), mean = mean(Value))
+```
+```{r}
+state_cities <- pricepersqft %>%
+  group_by(State) %>%
+  summarise_at(vars(matches("^January|^December")), ~ sum(!is.na(.))) %>%
+  pivot_longer(cols = 2:15,values_to = 'NumCities',names_to = 'Date') %>%
+  separate(Date,into=c('Month','Year')) %>%
+  filter(Month == 'December') %>% dplyr::select(State,Year,NumCities) %>%  rename(state_abbr = State) 
+
+state_price <- pricepersqft %>%
+  group_by(State) %>%
+  summarise_at(vars(matches("^January|^December")), ~ mean(., na.rm = TRUE)) %>%
+  mutate(change_2011 = `December 2011` - `January 2011`,
+         change_2012 = `December 2012` - `January 2012`,
+         change_2013 = `December 2013` - `January 2013`,
+         change_2014 = `December 2014` - `January 2014`,
+         change_2015 = `December 2015` - `January 2015`,
+         change_2016 = `December 2016` - `January 2016`,
+         value_2011 = `January 2011` ,
+         value_2012 = `January 2012` ,
+         value_2013 = `January 2013` ,
+         value_2014 = `January 2014` ,
+         value_2015 = `January 2015` ,
+         value_2016 = `January 2016` ) %>%
+  dplyr::select(State,"change_2011":"value_2016"  ) %>%
+  filter(!State == "AL") %>%
+  rename(state_abbr = State) %>%
+  pivot_longer("change_2011":"value_2016" , names_to = "Year", values_to = "Value") %>%
+  separate(Year,'\\_',into=c('Var','Year')) %>%
+  pivot_wider(names_from = Var,values_from = Value) %>%
+  rename(Monthly_Rent_Change =  change, Monthly_Rent = value)
+
+
+left_join(state_price,state_cities) %>%
+left_join(data.frame(state_abbr = state.abb, region = str_to_lower(state.name))) %>% 
+  left_join(states)
+
+
+states <- sf::st_as_sf(states,coord = c('long','lat'))
+
+```
+
+
+```{r}
+# pal <- colorNumeric(
+#   palette = "viridis",
+#   domain = states$Monthly_Rent_Change
+# )
+
+ui <- fluidPage(
+  titlePanel("Zillow Rent Estimate of States"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("slider", "Timeframe:",
+                  min = 2011, max = 2016,
+                  value = 2011, step = 1)
+    ),
+    mainPanel(
+      leafletOutput("map")
+    )
+  )
+)
+
+server <- function(input, output, session){
+  statesN <- reactive({
+    states <- subset(states, Year %in% input$slider)
+  })
+  
+  output$map <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>%
+      addPolygons(data = statesN(),
+                  stroke = FALSE,
+                  fillColor = ~pal(Monthly_Rent_Change), 
+                  popup = ~paste("Mean Monthly Rent for the Year", Monthly_Rent, "<br>", "Number of Cities Included in Mean" numCities)
+      ) %>%
+      addMiniMap(
+        centerFixed = c(21, -157.7),
+        zoomLevelFixed = 5,
+        position = "bottomleft"
+      )
+  })
+}
+
+
+shinyApp(ui,server)
+```
+

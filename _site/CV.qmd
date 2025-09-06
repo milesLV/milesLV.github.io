@@ -1,0 +1,9 @@
+---
+title: "Curriculum Vitae"
+---
+
+::: embed
+<embed src="./Miles_LibbeyV_Resume_2025.pdf" type="application/pdf" width="100%" height="600px" />
+:::
+
+[Download Resume (PDF)](Miles_LibbeyV_Resume_2025.pdf){target="_blank"}

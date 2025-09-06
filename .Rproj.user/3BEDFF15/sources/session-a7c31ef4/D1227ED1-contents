@@ -1,0 +1,96 @@
+---
+title: "Shiny & Plotly"
+subtitle: "HW9"
+author: "Miles Libbey"
+format: 
+  html:
+    self-contained: true
+---
+
+# Instructions
+
+Complete all parts of the Exercises section below to earn a Pass for this challenge.
+
+## Shiny (Part 1)
+
+Replicate the following Shiny app: <https://walkerke.shinyapps.io/neighborhood_diversity/> to the extent described below:
+
+**Requirements for passing:**
+
+- Have a dropdown of available cities
+- Have a sliding input to control the span parameter for scatterplot smoothing lines
+  - The following plots should update in response to changing the selected city in the dropdown. Use the data_by_dist dataset for all of these plots.
+- A scatterplot of diversity score (entropy) versus distance to city hall (distmiles) with a smoothing line (smoothness controlled by the span parameter on your slider input).
+- A map of diversity scores across the counties in the selected city
+- A bar chart of the overall race distribution in the selected city (i.e., the total number of people in each race category in the city)
+- Add a tab layout to your app to match the original app (3 tabs: "Explore metros", "Compare over time", and "About")
+- Have the layout in the "Explore metros" tab match that of the original app: first row contains the scatterplot, second row contains the map and bar chart
+
+
+Your Shiny app should look as below:
+
+![](https://bcheggeseth.github.io/212_spring_2025/images/shiny_app_goal.png){fig-align="center" width=600}
+
+<br>
+
+**Extra:** If you want to keep practicing and learning more features, add the following layout updates and functionality to your app:
+
+- In the "Compare over time" tab (still using the same selected city from the original dropdown):
+    - Add a line graph of diversity score versus distance to city hall with different color lines corresponding to 1990, 2000, 2010, and 2020
+    - Add 4 maps that show diversity scores across counties in 1990, 2000, 2010, and 2020
+- Recreate the text giving directions for using the app that appears in the left sidebar of the original app. Try to get exactly the same formatting.
+
+
+## Plotly (Part 2)
+
+
+**Goal:** Select points on the diversity score vs. distance to city hall scatterplot to have the map zoom in on and highlight the selected census tracts.
+
+**Reference:** Section 17.2 in the [online `plotly` book](https://plotly-r.com/linking-views-with-shiny) describes what we'll talk about here. After going through these exercises, I recommend reading through this section to reverse engineer the `plotly`-related steps below.
+
+**Steps:**
+
+- Add `key = tract_id` to the aesthetics section of your scatterplot.
+    - This is a tracking aesthetic that `plotly` uses to figure out what parts of the plot were clicked on, selected, or otherwise interacted with (e.g., hovered over, double clicked).
+    - We are using `tract_id` as the key because this will allow us to uniquely identify selected points with their `tract_id` in the `data_by_dist` dataset.
+
+- For your scatterplot, change your call to `ggplotly()` to the following:
+
+```{r plotly_step1, eval=FALSE}
+ggplotly(p, source = "plotly_scatterplot") %>%
+    event_register("plotly_selected")
+```
+
+- The `event_register("plotly_selected")` tells `plotly` to watch out for **selected** points---that is, selection of points is a user interaction **event** to watch out for. (To view other events, look at the `plotly::event_data()` documentation page.)
+- The `source = "plotly_scatterplot"` gives the `plotly` output an ID called `"plotly_scatterplot"`. This functions a lot like `shiny`'s `outputId` in that it can be called anything. We need this `source` argument in case there are multiple `plotly` outputs that the user can interact with. We will be able to refer to `"plotly_scatterplot"` to just get the user interaction events (selected points) that are on the scatterplot. (For example, there might be another `"plotly_click"` event on the map that we want to keep separate.)
+
+- Update the map part of your `server` section to have the following structure:
+
+```{r plotly_step2, eval=FALSE}
+ed <- event_data("plotly_selected", source = "plotly_scatterplot")
+
+if (is.null(ed)) {
+    p <- # ggplot code to make your map (your original map code)
+} else {
+    zoomed_area <- st_bbox(???)
+    
+    p <- # Updated ggplot code to zoom in to the selected census tracts and highlight their borders in red
+}
+```
+
+- You will need to fill in key parts in the above structure using concepts from our spatial viz unit: `st_bbox()`, `st_crop()`, multiple map layers.
+- You'll need to use the `%in%` operator instead of the `==` operator. The `%in%` operator checks if each element on the left is in the container on the right. 
+- You can obtain the census tracts of the selected points with `ed$key`. 
+
+**Requirements for passing:**
+
+- Select points on the diversity score vs. distance to city hall scatterplot to have the map zoom in on
+- Select points on the diversity score vs. distance to city hall scatterplot to have the map highlight the selected census tracts.
+
+
+**Submission:** Copy your `neighborhood_diversity` folder to the Github repo. Make all of your updates in this folder. Make sure you have an `app.R` file that is ready to be run in RStudio. Push your changes to GitHub by the deadline. (GitHub classroom automatically creates a pull request for receiving feedback.)
+
+
+
+
+

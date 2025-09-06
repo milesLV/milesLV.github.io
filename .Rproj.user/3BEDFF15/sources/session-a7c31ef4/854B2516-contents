@@ -1,0 +1,294 @@
+---
+title: "KnightTourMatrixVisual"
+categories: 
+  - R
+  - Self
+---
+
+## Imports
+
+```{r}
+library(tidyverse)
+library(Matrix)
+library(purrr)
+library(expm)
+library(plotly)
+library(stringr)
+```
+
+## Custom Functions
+
+```{r}
+generate_combinations <- function(ops, nums) {
+  # Convert to numeric if character
+  nums <- as.numeric(nums)
+
+  # Generate all permutations of numbers
+  permute <- function(v) {
+    if (length(v) == 1) return(list(v))
+    out <- list()
+    for (i in seq_along(v)) {
+      rest <- v[-i]
+      for (p in permute(rest)) {
+        out <- append(out, list(c(v[i], p)))
+      }
+    }
+    return(out)
+  }
+
+  # Parse operations into functions
+  parse_op <- function(op_string) {
+    if (op_string == "+") {
+      return(function(x) x)
+    } else if (op_string == "-") {
+      return(function(x) -x)
+    } else if (grepl("^\\^", op_string)) {
+      n <- as.numeric(sub("^\\^", "", op_string))
+      return(function(x) x^n)
+    } else if (grepl("^/", op_string)) {
+      n <- as.numeric(sub("^/", "", op_string))
+      return(function(x) x / n)
+    } else {
+      stop(paste("Unknown operation:", op_string))
+    }
+  }
+
+  # Convert all ops to functions
+  op_funcs <- lapply(ops, parse_op)
+
+  # Get all combinations of operations (each element gets an op)
+  op_combos <- expand.grid(rep(list(seq_along(op_funcs)), length(nums)))
+  
+  # Generate number permutations
+  num_perms <- permute(nums)
+
+  result <- list()
+
+  for (perm in num_perms) {
+    for (i in 1:nrow(op_combos)) {
+      indices <- as.integer(op_combos[i, ])
+      funcs <- op_funcs[indices]
+      transformed <- mapply(function(f, x) f(x), funcs, perm)
+      result <- append(result, list(transformed))
+    }
+  }
+
+  return(result)
+}
+
+# generate_combinations(c("+", "-"), c(1, 2))
+makeKnightMoves <- function(position, board_size = 8){
+  position <- as.numeric(position)
+
+  ifValid <- function(placement) {
+    all(placement > 0 & placement <= board_size)
+  }
+
+  if (length(position) != 2) {
+    stop("Position must have exactly 2 inputs")
+  } 
+  if (!ifValid(position)) {
+    stop("Please enter values between 1 and board size")
+  }
+
+  return(
+    compact(map(generate_combinations(c("+", "-"), c(1, 2)), function(a){
+      newPosition = c(position[1] + a[1], position[2] + a[2])
+      if (ifValid(newPosition)){
+        return(newPosition)
+      }
+    }))
+  )
+}
+
+makeKnightMoves(c(1,1))
+```
+
+## Lattice Adjacency Matrix
+
+```{r}
+mAeLatticeAdjMatrix <- function(numRows = 8, numCols = 8) {
+  cellTotal <- numRows * numCols
+  A <- matrix(0, nrow = cellTotal, ncol = cellTotal)
+  
+  index_from_coords <- function(row, col) {
+    return((row - 1) * numCols + col)
+  }
+  
+  for (rowIndex in 1:numRows) {
+    for (colIndex in 1:numCols) {
+      from_index <- index_from_coords(rowIndex, colIndex)
+      moves <- makeKnightMoves(c(rowIndex, colIndex), board_size = max(numRows, numCols))
+      for (move in moves) {
+        moveRow <- move[1]
+        moveCol <- move[2]
+        
+        if (moveRow <= numRows && moveCol <= numCols) {
+          to_index <- index_from_coords(moveRow, moveCol)
+          A[from_index, to_index] <- 1
+          A[to_index, from_index] <- 1  # undirected
+        }
+      }
+    }
+  }
+  
+  # return(as(A, "sparseMatrix"))
+  return(A)
+}
+
+A <- mAeLatticeAdjMatrix()
+image(A)
+```
+
+## Actual Plot
+
+```{r}
+plot_knight_from_matrix <- function(position = c(1, 1), A, n_rows = 8, n_cols = 8, exponent = 1, showPathsToExponent = FALSE) {
+  # Validate input
+  if (length(position) != 2 || 
+      !all(position >= 1) || 
+      position[1] > n_rows || 
+      position[2] > n_cols) {
+    stop("Position must be within the board dimensions")
+  }
+  if(showPathsToExponent && exponent != 1) {
+    ATotal <- A
+    for (i in 2:exponent) {
+      ATotal <- ATotal + A %^% i
+      
+    }
+    A <- ATotal
+  } else {
+    A <- A %^% exponent # exponentiationg
+  }
+
+  # Convert origin to matrix index
+  origin_index <- (position[1] - 1) * n_cols + position[2]
+  path_counts <- A[origin_index, ]
+
+  # Map index → coordinates
+  grid <- expand.grid(x = 1:n_cols, y = 1:n_rows)
+  grid$Index <- (grid$y - 1) * n_cols + grid$x
+  grid$Paths <- path_counts[grid$Index]
+
+  # Label the origin
+  grid$Type <- ifelse(grid$Index == origin_index, "Origin", "Other")
+
+  # Plot
+  ggplot(grid, aes(x = x, y = y, fill = Paths)) +
+    geom_tile(color = "grey60") +
+    geom_tile(data = grid %>% filter(Type == "Origin"), fill = "blue", color = "grey60") + 
+    scale_fill_gradient(low = "white", high = "firebrick", na.value = "white") +
+    geom_text(aes(label = ifelse(Paths > 0, Paths, "")), color = "black") +
+    coord_fixed() +
+    labs(title = paste("Knight Moves from", paste0("(", position[1], ",", position[2], ")"))) +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          axis.title = element_blank())
+}
+plot_knight_from_matrix(c(6,5), A, 7, 8, exponent = 40, showPathsToExponent = TRUE)
+```
+
+## Shiny App
+
+```{r, "Shiny App"}
+library(readr)
+library(shiny)
+library(tidyverse)
+library(sf)
+library(plotly)
+library(bslib)
+data_by_dist <- read_rds("data/diverse_data_by_dist.rds")
+data_by_year <- read_csv("data/diverse_data_by_year.csv")
+
+metro_names <- data_by_dist %>% pull(metro_name) %>% unique()
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    # Application title
+    # titlePanel("Neighborhood Diversity Plot"),
+
+    # Sidebar with a slider input for cities
+    sidebarLayout(
+        sidebarPanel(
+              selectInput("city", # id
+                          label = "Choose Metro Area",
+                          choices = metro_names),
+              sliderInput("span", #id
+                          label = "Line Smoothness",
+                          min = 0,
+                          max = 1,
+                          value = 0.5)
+          ),
+        
+        # Show plots
+        mainPanel(
+          navset_card_tab(
+            title = "Locating neighborhood diversity in the American metropolis",
+            nav_panel("Explore metros", plotlyOutput("plotly_scatterplot"), # adding plotly to this
+                      fluidRow(
+                        splitLayout(cellWidths = c("50%", "50%"), plotOutput("mapPlot"), plotOutput("barPlot")))
+                      ),
+            
+            nav_panel("Compare over time", verbatimTextOutput("summary")),
+            
+            nav_panel("About", tableOutput("table"))
+          )
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+    output$plotly_scatterplot <- renderPlotly({ #adding plotly to rendering
+      p <- data_by_dist %>%
+        filter(metro_name == input$city) %>%
+        ggplot(aes(x = distmiles, y = entropy)) +
+          geom_point(aes(key = tract_id)) +
+          geom_smooth(span = input$span, method = 'loess', se = FALSE)
+      
+      ggplotly(p, source = "plotly_scatterplot") %>%
+        event_register("plotly_selected") %>%
+        layout(dragmode = "select")   
+    })
+    
+    
+    
+    output$mapPlot <- renderPlot({
+      
+      ed <- event_data("plotly_selected", source = "plotly_scatterplot")
+      
+      if (is.null(ed)) {
+        p <- data_by_dist %>%
+          filter(metro_name == input$city) %>%
+          ggplot(aes(fill = entropy)) +
+            geom_sf()
+      } else {
+        filteredTracts <- data_by_dist %>% filter(tract_id %in% ed$key)
+        zoomed_area <- st_bbox(filteredTracts)
+        
+        p <- data_by_dist %>% # Updated ggplot code to zoom in to the selected census tracts and highlight their borders in red
+          st_crop(zoomed_area) %>%
+          ggplot(aes(fill = entropy)) +
+            geom_sf() +
+            geom_sf(data = filteredTracts, color = "yellow", linewidth = 1.2)
+      }
+      p
+    })
+
+    output$barPlot <- renderPlot({
+      data_by_dist %>%
+        st_drop_geometry() %>%  # dropping geometries
+        filter(metro_name == input$city) %>%
+        pivot_longer(cols = aian:white, values_to = "value", names_to = "race") %>%
+        group_by(race) %>%
+        summarize(total = sum(value)) %>% 
+        ggplot(aes(x = race, y = total)) +
+          geom_col()
+    })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+```

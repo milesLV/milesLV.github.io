@@ -1,0 +1,127 @@
+---
+title: "Loneliness Project"
+author: "Miles Libbey V"
+format: html
+editor: visual
+categories: 
+  - University
+  - Self-Directed
+  - Python
+---
+
+## Overview
+
+This project started as a project as part of the course, "Language in Social Media: A Computational Linguistics Perspective" taught by Zuoyu Tian, who was a great source of support in this project. The group consisted of Elan Levin, Sylvain Zong-Nabia, and myself. Our team set out to explore a pressing question:
+
+"Is loneliness becoming normalized among young people in the digital age?"
+
+We combined computational methods, sentiment analysis, and topic modeling to analyze thousands of social media posts from Reddit. Our findings shed light on how loneliness is not only experienced but also culturally discussed and potentially normalized. I went on individually to expand on the project and refine some of the aspects we didn't have time to address due to our heavy workloads in the final months of university.
+
+------------------------------------------------------------------------
+
+## Motivation
+
+Loneliness has become a growing concern among digital-native youth. While social media promises connectivity, it often fosters superficial interactions, comparison, and emotional withdrawal. Prior research shows clear links between social media and mental health challenges like anxiety and depression — but much less attention has been paid to whether loneliness itself is becoming *normalized* and how people are approaching it.
+
+We aimed to fill that gap.
+
+------------------------------------------------------------------------
+
+## Dataset
+
+-   **Source**: [FIG-Loneliness dataset](https://huggingface.co/datasets) (Jiang et al., 2022)
+-   **Posts**: 5,633 total (2,633 labeled “lonely,” 3,000 “non-lonely”)
+-   **Focus**: We analyzed 1,840 posts labeled as “lonely”
+-   **Subreddits**: r/loneliness, r/lonely, r/youngadults, r/college
+-   **Annotations**: Human-labeled categories (duration, context, coping strategies)
+
+------------------------------------------------------------------------
+
+## Methodology
+
+We combined **human annotation** and **LLM-assisted classification**:
+
+1.  **Custom Sentiment Schema**
+
+    -   *Optimistic*: hopeful about change
+    -   *Neutral*: no clear outlook
+    -   *Pessimistic*: hopeless, defeated
+
+    [✦]{style="font-size:0.7em;"} Later I experimented with a continuous scale of \[0,1\] to tease out more nuance
+
+2.  **Annotation & Agreement**
+
+    -   Three human annotators established baseline inter-rater agreement (Krippendorff’s α = 0.74)
+
+3.  **LLM-Assisted Scaling**
+
+    -   Used Google Gemini 2.0 Flash to label the full dataset
+    -   Evaluated with accuracy, precision, recall, and F1
+
+4.  **Deeper Analysis**
+
+    -   Ran LDA topic modeling to identify recurring themes
+    -   Applied 3 pretrained Hugging Face depression classifiers to map sentiment → depression severity
+
+------------------------------------------------------------------------
+
+## Results
+
+-   **Pessimism Dominates**: Most posts about loneliness were pessimistic; optimism was rare
+-   **LLM Accuracy**: Gemini achieved \~70% accuracy on test annotations, especially strong at detecting pessimistic posts (may be due to the former point)
+-   **Topic Modeling**:
+    -   *Topic 0*: direct discussions of loneliness, strongly pessimistic
+    -   *Topic 1*: college life & friendships, also pessimistic
+    -   *Topic 3*: slightly more room for neutral discussions
+-   **Depression Models**: Even “optimistic” posts showed strong associations with depression categories, suggesting that loneliness remains tied to negative mental health outcomes regardless of outlook
+
+------------------------------------------------------------------------
+
+## Key Takeaways
+
+-   **Normalization?** Our findings suggest loneliness is **not normalized in a neutral sense** — instead, it remains largely experienced as negative, isolating, and emotionally heavy
+-   **Methods Matter**: Annotating loneliness sentiment proved challenging, even for humans. LLMs can help scale annotation, but interpretation requires caution
+-   **Future Directions**:
+    -   Explore fine-grained loneliness categories (duration, coping)
+    -   Compare across age groups
+    -   Extend to other platforms beyond Reddit
+
+------------------------------------------------------------------------
+
+## My Contributions
+
+-   Designed the **sentiment annotation schema**.
+-   Coordinated the **human annotation process** and evaluated inter-rater agreement
+-   Implemented **LLM-assisted annotation pipeline** with Gemini
+-   Conducted **topic modeling (LDA)** and analyzed cross-topic sentiment trends
+-   Interpreted outputs from **Hugging Face depression models** to connect loneliness with broader mental health themes
+
+------------------------------------------------------------------------
+## Self-Directed Portion
+Although we had done a substantial portion, I went on 
+
+## Skills Showcased
+
+Skills demonstrated: · Natural Language Processing (NLP) · Annotation schema design & evaluation · Pseudo-labeling · Topic modeling (LDA) · Sentiment analysis & depression detection · Data storytelling & research synthesis
+
+------------------------------------------------------------------------
+
+## References
+
+-   Çıtak (ensarcitak), Ensar. “Ensarcitak/Dilbazlar-Multilabel-Depression-Anxiety-Detection-Model-Acc-91 · Hugging Face.” Huggingface.co, 2019, [huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91](http://huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91). Accessed 10 May 2025.
+
+-   Guntuku, S. C., Yaden, D. B., Kern, M. L., Ungar, L. H., & Eichstaedt, J. C. (2017). Detecting depression and mental illness on social media: an integrative review. Current Opinion in Behavioral Sciences, 18, 43-49.
+
+-   Jiang, Y., Jiang, Y., Leqi, L., & Winkielman, P. (2022). Many Ways to Be Lonely: Fine-Grained Characterization of Loneliness and Its Potential Changes in COVID-19. Proceedings of the International AAAI Conference on Web and Social Media, 16(1), 405-416. Retrieved from <https://ojs.aaai.org/index.php/ICWSM/article/view/19302>
+
+-   Khalaf, A. M., Alubied, A. A., Khalaf, A. M., Rifaey, A. A., Alubied, A., & Rifaey, A. (2023). The impact of social media on the mental health of adolescents and young adults: a systematic review. Cureus, 15(8).
+
+-   Koh, J. Y., McAleer, S., Fried, D., & Salakhutdinov, R. (2024). Tree search for language model agents. arXiv preprint arXiv:2407.01476.
+
+-   Park, H. W., Park, S., & Chong, M. (2020). Conversations and medical news frames on Twitter: Infodemiological study on COVID-19 in South Korea. Journal of medical internet research, 22(5), e18897.
+
+-   Poudel, A. (2024). Sentiment Classifier for Depression. Retrieved from <https://huggingface.co/poudel/sentiment-classifier>
+
+-   Rafał Poświata and Michał Perełkiewicz. 2022. OPI\@LT-EDI-ACL2022: Detecting Signs of Depression from Social Media Text using RoBERTa Pre-trained Language Models. In Proceedings of the Second Workshop on Language Technology for Equality, Diversity and Inclusion, pages 276–282, Dublin, Ireland. Association for Computational Linguistics.
+
+-   Twenge, J. M. (2019). More time on technology, less happiness? Associations between digital-media use and psychological well-being. Current Directions in Psychological Science, 28(4), 372-379.

@@ -1,0 +1,218 @@
+---
+title: "Madrid Metro MySQL Database"
+author: "Miles Libbey V"
+image: madridMetroIcon.png
+categories:
+  - University
+  - MySQL
+---
+
+## Project Overview
+
+Designed and implemented a MySQL database for Madrid's metro system with detailed schema and features based on a list of assumptions, including reactive triggers and events for calculating pricing, managing metro card validity, and handling client transactions dynamically based on age, city zone, and discount eligibility.
+
+------------------------------------------------------------------------
+
+## System Architecture
+
+**Relational Schema & EER Diagram**
+
+-   **Clients**: stores personal info, address, and the type of discount they receive
+-   **Cards**: monthly cards and rechargeable cards tied to each client
+-   **Cities**: city zones and their respective pricing rules
+-   **Statuses**: discount categories (student, senior, etc.)
+-   **Charge History**: logs transactions and recharges
+
+### Relational Schema
+
+![](images/madridMetroSchema.png){.lightbox fig-align="center"}
+
+### EER Diagram
+
+![](images/madridMetroIcon-01.png){.lightbox fig-align="center"}
+
+------------------------------------------------------------------------
+
+## Key Features
+
+### Database Modeling
+
+-   Normalized schema with primary/foreign keys and cascading deletes.
+-   Metadata defined for all entities, ensuring referential integrity.
+
+### Automation with Triggers & Events
+
+-   Automatic card issuance when registering a new client
+
+-   Recharge triggers that update validity and transaction logs
+
+-   Daily event to expire cards after 30 days without renewal
+
+-   Dynamic pricing trigger calculates ticket cost based on:
+
+    [✦]{style="font-size:0.65em;"} Age (student/senior discounts)
+
+    [✦]{style="font-size:0.65em;"} City zone
+
+    [✦]{style="font-size:0.65em;"} Special discount status
+
+### Lifecycle Management
+
+-   Full support for registration → recharge → replacement → cancellation / expiration
+-   `ON DELETE CASCADE` ensures dependent records are cleaned automatically
+-   Automatic re-pricing when client address or eligibility changes
+
+------------------------------------------------------------------------
+
+## Code Snippet Examples
+
+### 1. Automatic Card Creation
+
+``` sql
+DELIMITER //
+CREATE TRIGGER makeClientMonthlyCard
+AFTER INSERT ON clients
+FOR EACH ROW
+BEGIN
+    DECLARE last_number INT;
+    DECLARE newCardID INT;
+
+    SELECT COALESCE(MAX(CardID), 0) INTO last_number FROM monthlyCard;
+    SET newCardID = last_number + 1;
+
+    INSERT INTO monthlyCard (ClientID, CardID, CardType, DateCharged, IsValid)
+    VALUES (NEW.ClientID, newCardID, "M", CURDATE(), 1);
+END;//
+DELIMITER ;
+```
+
+*Automatically issues a monthly card when a new client registers*
+
+### 2. Automatic Recharge Handling
+
+``` sql
+DELIMITER //
+CREATE TRIGGER check_date_charged
+AFTER INSERT ON chargeHistory
+FOR EACH ROW
+BEGIN
+    UPDATE monthlyCard
+    SET DateCharged = CURDATE(), IsValid = 1
+    WHERE ClientID = NEW.ClientID;
+END;//
+DELIMITER ;
+```
+
+*Ensures monthly card validity updates instantly after a recharge*
+
+### 3. Daily Event to Expire Cards
+
+``` sql
+DELIMITER //
+CREATE EVENT updateValidity
+ON SCHEDULE EVERY 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE + INTERVAL 1 DAY) + INTERVAL '02:30:00' HOUR_SECOND
+DO
+BEGIN
+    UPDATE monthlyCard
+    SET IsValid = 0
+    WHERE DateCharged <= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+END;//
+DELIMITER ;
+```
+
+*Keeps card status accurate by expiring inactive cards daily*
+
+### 4. Dynamic Pricing Based on Age, Zone, and Circumstance
+
+``` sql
+DELIMITER //
+CREATE TRIGGER calculatePrice
+BEFORE INSERT ON clients
+FOR EACH ROW
+BEGIN
+    DECLARE client_age INT;
+    DECLARE client_discount DECIMAL(10,2);
+    DECLARE final_price DECIMAL(10,2);
+    DECLARE zone_price DECIMAL(10,2);
+    DECLARE ifStudent BOOLEAN;
+    DECLARE ifZoneA BOOLEAN;
+
+    SET client_age = TIMESTAMPDIFF(YEAR, NEW.BDay, CURDATE());
+
+    -- Apply senior discount when turning 65
+    IF client_age >= 65 THEN
+        SET NEW.discountType = CONCAT(SUBSTRING(NEW.discountType, 1, CHAR_LENGTH(NEW.discountType) - 1), 'M');
+    END IF;
+
+    SELECT statuses.discountAmount INTO client_discount
+      FROM statuses WHERE statuses.typeID = NEW.discountType;
+
+    IF NEW.discountType LIKE 'E%' THEN 
+      SET ifStudent = 1; 
+      ELSE SET ifStudent = 0; 
+    END IF;
+    
+    SELECT ZonePrice INTO zone_price FROM cities WHERE CityName = NEW.City;
+    
+    SELECT EXISTS(
+        SELECT 1 FROM clients
+        WHERE PostalCode LIKE '280%' AND ClientID = NEW.ClientID
+    ) INTO ifZoneA;
+
+    IF ifStudent = 1 AND client_age >= 65 THEN
+        SET final_price = 6.30 * client_discount;
+    ELSEIF client_age < 26 OR ifStudent = 1 THEN
+        SET final_price = 20.00 * client_discount;
+    ELSEIF client_age >= 65 THEN
+        SET final_price = 6.30 * client_discount;
+    ELSEIF ifZoneA = 1 THEN
+        SET final_price = 54.60 * client_discount;
+    ELSE
+        SET final_price = zone_price * client_discount;
+    END IF;
+
+    INSERT INTO chargeHistory (ClientID, ChargeAmount, Type) 
+    VALUES (NEW.ClientID, final_price, "Purchase");
+END;//
+DELIMITER ;
+```
+
+*Determines ticket cost dynamically based on multiple client attributes*
+
+------------------------------------------------------------------------
+
+## Example Queries
+
+``` sql
+-- Show all clients in Leganés with zone category and purchase price
+SELECT clients.*, cities.ZoneID, chargeHistory.ChargeAmount
+  FROM clients
+  INNER JOIN cities ON clients.City = cities.CityName
+  INNER JOIN chargeHistory ON clients.ClientID = chargeHistory.ClientID
+  WHERE clients.City = 'Leganes';
+```
+
+``` sql
+-- Check validity of a specific client’s card
+SELECT ClientID, isValid 
+  FROM monthlyCard
+  WHERE ClientID = "002";
+```
+
+------------------------------------------------------------------------
+
+## Technical Highlights
+
+-   SQL: DDL, DML, joins, triggers, events, cascading constraints
+-   Relational schema design with 1:1 and 1:M relationships
+-   Business rules automation embedded directly in the database
+-   Data integrity & lifecycle tracking across multiple entities
+
+------------------------------------------------------------------------
+
+## Skills
+
+This project demonstrates my ability to: - Design real-world relational databases - Implement automated logic based on given assumptions inside SQL - Manage complex client workflows in a high-traffic system
+
+> **Skills Demonstrated**: MySQL · Relational Database Design · SQL Triggers & Events · Data Lifecycle Management

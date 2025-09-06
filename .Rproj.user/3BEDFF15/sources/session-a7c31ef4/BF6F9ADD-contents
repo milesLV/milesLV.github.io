@@ -1,0 +1,17 @@
+---
+title: "Madrid Metro MySQL Database"
+image: madridMetroIcon.png
+categories:
+  - MySQL
+  - University
+---
+
+Designed and implemented a MySQL database for Madrid's metro system with detailed schemas and features, including dynamic triggers and events for calculating pricing, managing metro card validity, and handling client updates based on age, city zone, and discount eligibility.
+
+## EER Diagram:
+
+![](images/madridMetroIcon-02.png)
+
+## Schema Diagram:
+
+![](images/madridMetroSchema.png)

@@ -1,0 +1,1131 @@
+---
+title: "CapstonePresentation
+author: "Miles Libbey"
+date: "2025-1-28"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(readr)
+library(haven)
+library(ggplot2)
+library(ggalluvial)
+library(ggmosaic)
+library(purrr)
+library(data.table)
+library(tidymodels)
+library(ranger)
+library(vip)
+library(tibble)
+library(FactoMineR)
+library(factoextra)
+
+set.seed(1111)
+```
+
+The purpose of this markdown is to explore the trends in housing status in state affiliated substance facilities.
+
+## Loading Data
+
+```{r echo=FALSE}
+recode_dataset <- function(data, codebook) { #ChatGPT helped write this
+  recoded_data <- data
+  
+  for (variable in unique(codebook$Variable)) {
+    variable_mapping <- codebook[codebook$Variable == variable, ]
+    value_to_label <- setNames(variable_mapping$Label, variable_mapping$Value)
+    
+    if (variable %in% colnames(data)) {
+      recoded_data[[variable]] <- as.character(value_to_label[as.character(data[[variable]])])
+    }
+  }
+  return(recoded_data)
+}
+
+load("/Users/miles5/Desktop/tedsd_puf_2021_r.rdata")
+codebook <- read.csv("/Users/miles5/Desktop/TEDS_DCodebookFinal.csv")
+tedsd_2021_raw <- tedsd_puf_2021_r
+
+recoded_tedsd_2021 <- recode_dataset(tedsd_2021_raw, codebook) %>% 
+  filter(
+    LIVARAG != "Missing/unknown/not collected/invalid",
+    LIVARAG_D != "Missing/unknown/not collected/invalid",
+    REASON == "Treatment completed"
+  )
+
+recoded_tedsd_2021  <- recoded_tedsd_2021 %>%
+  # dplyr::select(-DISYR, -CASEID, -contains("FLG"), -CBSA2020, -REASON) %>%
+  dplyr::select(AGE, EDUC, ETHNIC, STFIPS, MARSTAT, EMPLOY, EMPLOY_D, LIVARAG, LIVARAG_D, SERVICES, LOS, SUB1, contains("FREQ_ATND"), FRSTUSE1, DSMCRIT,contains("ARREST"), NOPRIOR, FREQ1_D) %>%
+  mutate(LIVARAG_delta = if_else(LIVARAG != LIVARAG_D,1,0)) %>%
+  rename("SELF_HELP_GROUP" = FREQ_ATND_SELF_HELP,
+         "SELF_HELP_GROUP_D" = FREQ_ATND_SELF_HELP_D,
+         "MARRIAGE" = MARSTAT,
+         "LENGTHofSTAY" = LOS,
+         "NUM_ARRESTS" = ARRESTS,
+         "NUM_ARRESTS_D" = ARRESTS_D,
+         "NUM_PRIOR"= NOPRIOR,
+         "FREQofUSE_D" = FREQ1_D) %>%
+  mutate(DSMCRIT= recode(DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT),
+        LENGTHofSTAY = recode(LENGTHofSTAY,
+           "1" = "< 1 week stay", "2" = "< 1 week stay", "3" = "< 1 week stay",
+           "4" = "< 1 week stay", "5" = "< 1 week stay", "6" = "< 1 week stay",
+           "7" = "1-2 week stay", "8" = "1-2 week stay", "9" = "1-2 week stay",
+           "10" = "1-2 week stay", "11" = "1-2 week stay", "12" = "1-2 week stay",
+           "13" = "1-2 week stay", "14" = "1-2 week stay",
+           "15" = "2-3 week stay", "16" = "2-3 week stay", "17" = "2-3 week stay",
+           "18" = "2-3 week stay", "19" = "2-3 week stay", "20" = "2-3 week stay",
+           "21" = "2-3 week stay",
+           "22" = "3-4 week stay", "23" = "3-4 week stay", "24" = "3-4 week stay",
+           "25" = "3-4 week stay", "26" = "3-4 week stay", "27" = "3-4 week stay",
+           "28" = "3-4 week stay",
+           "29" = "< 30 day stay", "30" = "< 30 day stay",
+           .default = LENGTHofSTAY),
+        SERVICES = recode(SERVICES,
+           "Detox, 24-hour, hospital inpatient" = "Short-term Detox, hospital",
+           "Detox, 24-hour, free-standing residential" = "Short-term Detox, residential",
+           "Rehab/residential, short term (30 days or fewer)" = "Rehab/Resident, ≤ 30 days",
+           .default = SERVICES
+           ),
+        SELF_HELP_GROUP = recode(SELF_HELP_GROUP,
+           "No attendance" = "No attendance to Self-Help Group",
+           "1-3 times in the past month" = "Attended Self-Help Group 1-3 times in past month",
+            "4-7 times in the past month " = "Attended Self-Help Group 4-7 times in past month",
+           "8-30 times in the past month" = "Attended Self-Help Group 8-30 times in past month",
+           "8-30 times in the past month" = "Attended Self-Help Group 8-30 times in past month",
+           "Some attendance, frequency is unknown" = "Some Attendance to Self-Help Group"),
+        SELF_HELP_GROUP_D = recode(SELF_HELP_GROUP_D,
+           "No attendance" = "No attendance to Self-Help Group",
+           "1-3 times in the past month" = "Attended Self-Help Group 1-3 times in past month",
+            "4-7 times in the past month " = "Attended Self-Help Group 4-7 times in past month",
+           "8-30 times in the past month" = "Attended Self-Help Group 8-30 times in past month",
+           "8-30 times in the past month" = "Attended Self-Help Group 8-30 times in past month",
+           "Some attendance, frequency is unknown" = "Some Attendance to Self-Help Group"),
+        FREQofUSE_D = recode(FREQofUSE_D,
+            "No use in the past month" = "No substance use in the past month",
+            "Some use " = "Some substance use in the past month",
+            "Daily use" = "Daily substance use in the past month"))
+
+rm(tedsd_puf_2021_r)
+
+graphBlue <- "#56B4E9"
+graphGreen <- "#7fc9a7"
+graphOrange <- "#f0b494"
+
+```
+
+## Setting up the Data Set
+
+```{r, echo=FALSE}
+political_grouping <- c(
+    "1" = "Red", "2" = "Red", "5" = "Red", "8" = "Red", "9" = "Red", "17" = "Red", "18" = "Red",
+    "20" = "Red", "21" = "Red", "22" = "Red", "28" = "Red", "29" = "Red", "30" = "Red", 
+    "38" = "Red", "40" = "Red", "45" = "Red", "46" = "Red", "47" = "Red", "48" = "Red", 
+    "49" = "Red", "54" = "Red", "56" = "Red",
+    
+    "6" = "Blue", "8" = "Blue", "9" = "Blue", "11" = "Blue", "15" = "Blue", "17" = "Blue", 
+    "24" = "Blue", "25" = "Blue", "27" = "Blue", "34" = "Blue", "35" = "Blue", "36" = "Blue", 
+    "50" = "Blue", "51" = "Blue", "53" = "Blue",
+    
+    "4" = "Swing", "12" = "Swing", "13" = "Swing", "26" = "Swing", "32" = "Swing", "33" = "Swing",
+    "37" = "Swing", "39" = "Swing", "42" = "Swing", "55" = "Swing"
+)
+
+tedsd_2021 <- tedsd_2021_raw %>%
+  mutate(across(everything(), haven::zap_labels)) %>%
+  mutate(Political_State = political_grouping[STFIPS]) %>%
+  filter(
+    LIVARAG != -9,
+    LIVARAG_D != -9,
+    REASON == 1,
+    !is.na(Political_State)
+  ) %>%
+  mutate(across(everything(), as.factor)) %>%
+    mutate(LIVARAG = recode(
+    LIVARAG,
+    `1` = "Unhoused",
+    `2` = "Dependent Living",
+    `3` = "Independent Living"
+    )
+  ) %>%
+  mutate(LIVARAG_D = recode(
+    LIVARAG_D,
+    `1` = "Unhoused",
+    `2` = "Dependent Living",
+    `3` = "Independent Living"
+    )) %>%
+  mutate(LIVARAG = factor(LIVARAG, levels = c("Independent Living","Dependent Living","Unhoused"))) %>%
+  mutate(LIVARAG_D = factor(LIVARAG_D, levels = c("Independent Living","Dependent Living","Unhoused"))) %>%
+  dplyr::select(-REASON, -contains("FLG"), -DISYR)
+```
+
+## Graph 0: Basic Numbers of Admitted
+
+```{r}
+tedsd_2021 %>%
+  group_by(LIVARAG) %>%
+  # mutate(LIVARAG = factor(LIVARAG, c("Unhoused", "Dependent Living", "Independent Living"))) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x = LIVARAG, y = n, fill = LIVARAG)) +
+    geom_bar(stat = "identity") +
+    labs(x = "Living Arrangement at Admission", y = "# of Substance Abuse Clients", title = "Count of Each Living Arrangment at Admission") + 
+    scale_fill_manual(values = c(graphGreen, graphBlue, graphOrange)) +
+    scale_y_continuous(labels = scales::comma_format()) +
+    theme(legend.position = "none",
+          axis.text.x = element_text(size = 10),
+          axis.title.x = element_text(size = 12),
+          axis.title.y = element_text(size = 12))#,
+          # axis.title.x.bottom = element_text(size = 10))
+ggsave("basicAdmissionPlot.png")
+
+```
+
+
+## Graph 1: Alluvial Plot Showing how Housing Status Changes in a Vacuum
+
+```{r, fig.width=14}
+tedsd_2021_alluvial <- tedsd_2021 %>%
+    mutate(LIVARAG = recode(LIVARAG, #adding returns for readability / aesthetics
+    "Unhoused" = "Unhoused",
+    "Dependent Living" = "Dependent\n Living",
+    "Independent Living" = "Independent\n Living",
+    )
+  ) %>%
+  mutate(LIVARAG_D = recode(LIVARAG_D,
+    "Unhoused" = "Unhoused",
+    "Dependent Living" = "Dependent\n Living",
+    "Independent Living" = "Independent\n Living",
+    )
+  ) %>%
+  mutate(LIVARAG = factor(LIVARAG, levels = c("Independent\n Living", "Dependent\n Living", "Unhoused"))) %>%
+  mutate(LIVARAG_D = factor(LIVARAG_D, levels = c("Independent\n Living", "Dependent\n Living", "Unhoused")))
+
+tedsd_2021_alluvial %>%
+  group_by(LIVARAG, LIVARAG_D) %>%
+  summarize(count = n(), .groups = 'drop') %>%
+  group_by(LIVARAG) %>%
+  mutate(total = sum(count)) %>%
+  ungroup() %>%
+  mutate(percentage = count / total * 100) %>%
+  ggplot(aes(axis1 = LIVARAG, axis2 = LIVARAG_D, y = percentage)) +
+    geom_alluvium(aes(fill = LIVARAG)) +
+    geom_stratum() +
+    geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+    scale_x_discrete(limits = c("Admission", "Discharge"), expand = c(.12, .12)) +
+    scale_fill_manual(values = c(graphOrange, graphBlue, graphGreen)) +
+    labs(title = "Living Arrangements at Admission and Discharge by Substance",
+         y = "Percentage",
+         x = NULL) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(size = 14),
+          axis.text.y = element_text(size = 14), 
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16), 
+          plot.title = element_text(size = 18, face = "bold"),
+          strip.text = element_text(size = 18),
+          legend.position = "none"
+    )
+```
+
+On its own, the most stable group is the independent living housing group, with a majority of population remaining the same 
+
+
+## Graph 3: Alluvial Plot Showing How Length of Stay Above 30 Days Impacts Changes in Housing
+
+```{r, fig.width = 12, fig.height=8}
+tedsd_2021 %>%
+  # mutate(LOS = as.numeric(LOS)) %>% # Optional For Grouping LOS together
+  #   mutate(LOS = cut(
+  #   LOS,
+  #   breaks = c(0, 30, 35, 37),
+  #   labels = c("< 30 days", "30-180 days", "181 - 365+ days"),
+  #   include.lowest = TRUE,
+  #   right = TRUE
+  # )) %>%
+  mutate(LOS = case_when(
+    LOS %in% 1:30 ~ "< 30 days",
+    LOS == 31 ~ "31-45 days",
+    LOS == 32 ~ "46-60 days",
+    LOS == 33 ~ "61-90 days",
+    LOS == 34 ~ "91-120 days",
+    LOS == 35 ~ "121-180 days",
+    LOS == 36 ~ "181-365 days",
+    LOS == 37 ~ "365+ days"
+    )
+  ) %>%
+  # mutate(LOS = factor(LOS, levels = c("< 30 days", "30-180 days", "181 - 365+ days"))) %>% #Optional for Grouping LOS together
+  mutate(LOS = factor(LOS, levels = c("< 30 days", "31-45 days", "46-60 days", "61-90 days", "91-120 days", "121-180 days", "181-365 days", "365+ days"))) %>%
+  group_by(LIVARAG, LOS, LIVARAG_D) %>%
+  summarize(count = n(), .groups = 'drop') %>%
+  group_by(LIVARAG, LOS) %>%
+  mutate(total = sum(count)) %>%
+  ungroup() %>%
+  mutate(percentage = count / total * 100) %>% 
+    mutate(LIVARAG_delta = case_when( #conditions on how housing changes from admission to discharge
+    LIVARAG == "Unhoused" & LIVARAG_D == "Unhoused" ~ "Didn't Change Housing",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Dependent Living" ~ "Went into Dependent Living",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Independent Living" ~ "Went into Independent Living",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Unhoused" ~ "Became Unhoused",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Dependent Living" ~ "Didn't Change Housing",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Independent Living" ~ "Went into Independent Living",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Unhoused" ~ "Became Unhoused",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Dependent Living" ~ "Went into Dependent Living",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Independent Living" ~ "Didn't Change Housing"
+    )
+  ) %>%
+  mutate(LIVARAG_delta = factor(LIVARAG_delta, levels = c("Didn't Change Housing", "Became Unhoused",
+        "Went into Dependent Living", "Went into Independent Living"))
+  ) %>%
+  mutate(LIVARAG = recode(LIVARAG, #adding returns for readability / aesthetics
+    "Unhoused" = "Admitted as Unhoused",
+    "Dependent Living" = "Admitted as Living Dependently",
+    "Independent Living" = "Admitted as Living Independently",
+    ),
+    LIVARAG = factor(LIVARAG, levels = c("Admitted as Unhoused", "Admitted as Living Dependently", "Admitted as Living Independently"))
+  ) %>%
+  ggplot(aes(x = LOS, y = percentage, fill = LIVARAG_delta)) +
+    geom_bar(stat = "identity", position = "stack") +
+    facet_wrap(~LIVARAG, ncol = 1, scales = "free_y") +
+    scale_fill_manual(values = c("#0072B2", graphBlue, graphGreen, graphOrange)) +
+    labs(title = "Change in Clients' Housing Situation by Admitted Living Arrangement and Length of Stay",
+         x = "Length of Stay (Above 30 days)",
+         y = "Percentage of Clients (%)",
+         fill = "Change in Housing Status") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12), 
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16), 
+          plot.title = element_text(size = 16, face = "bold"),
+          strip.text = element_text(size = 14),
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 13))
+```
+
+# Mosaic 1: Changes in Living Arrangement by Length of Stay
+
+```{r, fig.height=7,fig.width=7}
+tedsd_2021 %>%
+  mutate(LOS = as.numeric(LOS), 
+         LOS = cut(LOS,
+                   breaks = c(0, 30, 32, 37),
+                   labels = c("Under 1 month", "30-90 days", "Over 90 days"),
+                   include.lowest = TRUE,
+                   right = TRUE
+         )
+  ) %>%
+  mutate(LIVARAG_delta = case_when(
+    LIVARAG == "Unhoused" & LIVARAG_D == "Unhoused" ~ "Same",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Dependent Living" ~ "Improved",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Independent Living" ~ "Improved",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Unhoused" ~ "Worse",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Dependent Living" ~ "Same",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Independent Living" ~ "Improved",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Unhoused" ~ "Worse",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Dependent Living" ~ "Worse",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Independent Living" ~ "Same"
+  )) %>%
+  count(LOS, LIVARAG_delta) %>%
+  group_by(LOS) %>%
+  mutate(proportion = n / sum(n)) %>%
+  mutate(LIVARAG_delta = factor(LIVARAG_delta, levels = c("Worse", "Same", "Improved"))) %>%
+  ggplot(aes(x = LOS, y = proportion, fill = LIVARAG_delta)) +
+    geom_bar(stat = "identity", position = "fill") +
+    geom_text(aes(label = scales::percent(proportion, accuracy = 0.1)),
+              position = position_fill(vjust = 0.5), size = 5, fontface = "bold") +
+    labs(title = "Impact of Length of Stay on Living Situation",
+         subtitle = "Among Substance Use Patients in Public Facilities (2021)",
+         x = "Length of Stay",
+         y = "Percentage of Patients",
+         fill = "Living Arrangement Change") +
+    scale_fill_manual(values = c("Improved" = "darkgreen", "Same" = "gray", "Worse" = "red")) +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+          plot.subtitle = element_text(face = "italic", hjust = 0.5, size = 11),
+          axis.title.x = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(size = 12, face = "bold"))
+```
+
+Interpretation: There seems to be a positive relationship between Length of Stay (LOS) and an upward change in housing status. On average, the longer a client stays in treatment, the more likely they are to move from being unhoused to living in independent housing (e.g., low-income or supportive housing) or from dependent housing to independently residing in an apartment or house of their own.
+   When treatment durations are shorter, the proportions of clients experiencing upward and downward changes in housing status become more balanced. However, for clients with stays of more than 90 days, there is roughly the same number of individuals maintaining their current housing situation, but a greater proportion experience upward mobility, while significantly fewer see downward changes. This finding strongly supports the idea that longer treatment durations foster housing stability and improvement. Moreover, since this category includes lengths of stay extending well beyond 90 days (up to a year or more), it reinforces the trend of increased positive outcomes with longer treatment durations.
+
+# Random Forest Classification
+
+```{r, fig.height=6, fig.width=4}
+modelDataSubset <- tedsd_2021 %>%
+  mutate(SUB2 = ifelse(SUB2 == 1, 1, 0)) %>%
+  mutate(SUB3 = ifelse(SUB3 == 1, 1, 0)) %>%
+  mutate(SERVICES = case_when(
+  SERVICES == 1 | SERVICES == 2 ~ "Detox, 24 hour",
+  SERVICES == 3 | SERVICES == 4 | SERVICES == 5 ~ "Rehab/Residential",
+  SERVICES == 6 | SERVICES == 7 | SERVICES == 8 ~ "Ambulatory"
+  )) %>%
+  mutate(LIVARAG_delta = case_when( 
+    LIVARAG == "Unhoused" & LIVARAG_D == "Unhoused" ~ "Same",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Dependent Living" ~ "Improved",
+    LIVARAG == "Unhoused" & LIVARAG_D == "Independent Living" ~ "Improved",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Unhoused" ~ "Worse",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Dependent Living" ~ "Same",
+    LIVARAG == "Dependent Living" & LIVARAG_D == "Independent Living" ~ "Improved",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Unhoused" ~ "Worse",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Dependent Living" ~ "Worse",
+    LIVARAG == "Independent Living" & LIVARAG_D == "Independent Living" ~ "Same"
+  )) %>%
+  mutate(LIVARAG_delta = factor(LIVARAG_delta, levels = c("Improved", "Same", "Worse"))) %>%
+  dplyr::select(LIVARAG_delta, AGE, GENDER, ETHNIC, EDUC, RACE, MARSTAT, VET, LIVARAG, EMPLOY, EMPLOY_D, FREQ1, FREQ1_D, FRSTUSE1, DSMCRIT, PSYPROB, PSOURCE, STFIPS, HLTHINS, ARRESTS_D, NOPRIOR, SUB1, SUB2, SUB3, METHUSE, LOS, SERVICES, REASON, FREQ_ATND_SELF_HELP_D)
+
+rf_spec <- rand_forest() %>%
+  set_engine(engine = 'ranger') %>% 
+  set_args(mtry = NULL, 
+           trees = 500, 
+           min_n = 2,
+           probability = FALSE, 
+           importance = 'impurity') %>% 
+  set_mode('classification') 
+
+data_rec <- recipe(LIVARAG_delta ~ ., data = modelDataSubset) # Predicting Living arrangment at Discharge
+
+data_wf <- workflow() %>%
+  add_model(rf_spec) %>%
+  add_recipe(data_rec)
+
+rf_fit <- fit(data_wf, data = modelDataSubset)
+
+rf_fit
+
+var_imp <- rf_fit %>%
+    extract_fit_engine() %>%
+    pluck("variable.importance") %>%
+    enframe(name = "Variable", value = "Importance") %>%
+    arrange(desc(Importance))
+
+# Print top variables
+print(var_imp)
+
+#accuracy of random forest model
+rf_OOB_output <- function(fit_model, model_label, truth){
+    tibble(
+          .pred_Unemployed = fit_model %>% extract_fit_engine() %>% pluck('predictions'), #OOB predictions
+          LIVARAG_delta = truth,
+          label = model_label
+      )
+}
+
+output <- rf_OOB_output(rf_fit, "test", modelDataSubset %>% pull(LIVARAG_delta))
+output %>% 
+    accuracy(truth = LIVARAG_delta, estimate = .pred_Unemployed)
+```
+
+# Hyper-Parameter Tuning
+
+```{r}
+rf_spec <- rand_forest() %>%
+  set_engine(engine = 'ranger') %>% 
+  set_mode('classification')
+
+data_rec <- recipe(LIVARAG_D ~ ., data = modelDataSubset)
+
+data_wf <- workflow() %>%
+  add_model(rf_spec) %>%
+  add_recipe(data_rec)
+
+rf_grid <- grid_random( #Grid to tune to
+  trees(c(300,1500)),
+  min_n(c(2, 7)) 
+)
+
+cv_folds <- vfold_cv(modelDataSubset, v = 5)
+
+
+tune_results <- tune_grid( # Actually tuning the model
+  object = data_wf,
+  resamples = cv_folds, 
+  grid = rf_grid, 
+  metrics = metric_set(accuracy)
+)
+
+tune_results
+
+best_rf <- select_best(tune_results, metric = "accuracy")
+
+final_rf <- finalize_workflow(data_wf, best_rf)
+
+final_rf_fit <- fit(final_rf, data = modelDataSubset)
+final_rf_fit
+```
+
+# Shared Characteristics of Everyone:
+```{r}
+recoded_tedsd_2021 %>%
+  dplyr::select(-contains("LIVARAG")) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(Total = nrow(recoded_tedsd_2021),
+         Percentage = n / Total * 100) %>% 
+  mutate(rank = dense_rank(-Percentage)) %>% 
+  filter(rank <= 20) %>% 
+  arrange(desc(Percentage)) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage)) +
+    geom_bar(stat = "identity", fill = graphBlue) +
+    coord_flip() +
+    labs(title = "Most Common Attributes Among Everyone",
+         x = "Attribute",
+         y = "Percentage") +
+    theme_bw()
+```
+
+# Shared Characteristics of Unhoused People
+
+```{r}
+numOfAttributes <- 10
+recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>% 
+  dplyr::select(-LIVARAG) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Unhoused", Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(Total = nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused")),
+         Percentage = n / Total * 100) %>% 
+  mutate(rank = dense_rank(-Percentage)) %>% 
+  filter(rank <= numOfAttributes) %>% 
+  arrange(desc(Percentage)) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage)) +
+    geom_bar(stat = "identity", fill = graphGreen) +
+    coord_flip() +
+    labs(title = "Most Common Attributes Among Homeless Group",
+         x = "Most Common Attribute",
+         y = "Percentage") +
+    theme_bw()
+
+recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused", str_detect(LIVARAG_D, "Unhoused")) %>%
+  dplyr::select(-contains("LIVARAG")) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(Percentage = n / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused", str_detect(LIVARAG_D, "Unhoused")))) %>% 
+  mutate(rank = dense_rank(-Percentage)) %>% 
+  filter(rank <= numOfAttributes) %>% 
+  arrange(desc(Percentage)) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage)) +
+    geom_bar(stat = "identity", fill = graphGreen) +
+    coord_flip() +
+    labs(title = "Homeless Group Who Stayed Unhoused",
+         x = "Most Common Attribute",
+         y = "Percentage") +
+    theme_bw() +
+    scale_y_continuous(labels = scales::percent) +
+    theme(axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 10))
+
+# Characteristics of Unhoused people who make it to Independent
+gotOutOfHomelessnessGreen <- "#d4e663"
+recoded_tedsd_2021 %>%
+  mutate(DSMCRIT= recode(
+    DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT)
+    ) %>%
+  filter(LIVARAG == "Unhoused", 
+         str_detect(LIVARAG_D, "[Dd]ependent")
+         ) %>%
+  dplyr::select(-contains("LIVARAG")) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(Percentage = n() / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused", str_detect(LIVARAG_D, "[Dd]ependent"))), .groups = "drop") %>% 
+  mutate(rank = dense_rank(-Percentage)) %>% 
+  filter(rank <= numOfAttributes) %>% 
+  arrange(desc(Percentage)) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage)) +
+    geom_bar(stat = "identity", fill = "#d4e663") +
+    coord_flip() +
+    labs(title = "Homeless Group Who Made it Out",
+         x = "Attribute",
+         y = "Percentage") +
+    scale_y_continuous(labels = scales::percent) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 10))
+```
+# Miles Libbey's Monster
+```{r}
+independent <- recoded_tedsd_2021 %>%
+  mutate(DSMCRIT= recode(
+    DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT)
+    ) %>%
+  filter(LIVARAG == "Unhoused", 
+         str_detect(LIVARAG_D, "[Dd]ependent")
+         ) %>%
+  dplyr::select(-contains("LIVARAG")) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(PercentageInd = n() / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused", str_detect(LIVARAG_D, "[Dd]ependent"))), .groups = "drop") %>%
+  mutate(rankUnhoused = dense_rank(-PercentageInd))
+
+successUnhousedLead <- recoded_tedsd_2021 %>%
+  mutate(DSMCRIT= recode(
+    DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT)
+    ) %>%
+  filter(LIVARAG == "Unhoused", 
+         str_detect(LIVARAG_D, "Unhoused")
+         ) %>%
+  dplyr::select(-contains("LIVARAG")) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(PercentageUnhoused = n() / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused", str_detect(LIVARAG_D, "Unhoused"))), .groups = "drop") %>% 
+  mutate(rankUnhoused = dense_rank(-PercentageUnhoused)) %>% 
+  filter(rankUnhoused <= numOfAttributes) %>% 
+  arrange(desc(PercentageUnhoused)) %>%
+  left_join(independent, by = c("Variable", "Value"))
+
+successUnhousedLead %>%
+  pivot_longer(cols = c(PercentageUnhoused, PercentageInd), 
+               names_to = "Category", 
+               values_to = "Percentage") %>%
+  mutate(Category = recode(Category, 
+                            "PercentageInd" = "Remained Unhoused", 
+                           "PercentageUnhoused" = "Secured Housing",
+                           ),
+          Category = factor(Category, levels = c("Secured Housing","Remained Unhoused"))
+         ) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage, fill = Category)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    coord_flip() +
+    labs(title = "Comparing Common Features in Unhoused Group",
+         x = "Attribute",
+         y = "Percentage") +
+    scale_y_continuous(labels = scales::percent) +
+    scale_fill_manual(values = c("Secured Housing" = graphGreen,"Remained Unhoused"= gotOutOfHomelessnessGreen))+
+    theme_bw() + 
+    theme(axis.text.x = element_text(size = 12),
+          axis.text.y = element_blank(),
+          legend.title = element_blank(),
+          legend.position = "blank"
+          )
+```
+
+# The Other Amalgamation
+
+```{r}
+stayingIndependent <- recoded_tedsd_2021 %>%
+  mutate(DSMCRIT= recode(
+    DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT)
+    ) %>%
+  filter(LIVARAG == "Independent living", LIVARAG_D == "Independent living") %>%
+  dplyr::select(-contains("LIVARAG")) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(PercentageInd = n() / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Independent living", LIVARAG_D == "Independent living")), .groups = "drop") %>%
+  mutate(rankUnhoused = dense_rank(-PercentageInd))
+
+successIndependentLead <- recoded_tedsd_2021 %>%
+  mutate(DSMCRIT= recode(
+    DSMCRIT,
+    "Missing/unknown/not collected/invalid/no or deferred diagnosis" = "Unknown/no/deferred diagnosis",
+    .default = DSMCRIT)
+    ) %>%
+  filter(LIVARAG == "Unhoused", 
+         LIVARAG_D != "Independent living"
+         ) %>%
+  dplyr::select(-contains("LIVARAG")) %>%     
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>% 
+  summarise(PercentageNotInd = n() / nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Independent living", LIVARAG_D != "Independent living")), .groups = "drop") %>% 
+  mutate(rankNotInd = dense_rank(-PercentageNotInd)) %>% 
+  filter(rankNotInd <= numOfAttributes) %>% 
+  arrange(desc(PercentageNotInd)) %>%
+  left_join(stayingIndependent, by = c("Variable", "Value"))
+
+successUnhousedLead %>%
+  pivot_longer(cols = c(PercentageUnhoused, PercentageInd), 
+               names_to = "Category", 
+               values_to = "Percentage") %>%
+  mutate(Category = recode(Category, 
+                            "PercentageUnhoused" = "Remained Unhoused",
+                            "PercentageInd" = "Secured Housing",
+                           ),
+          Category = factor(Category, levels = c("Remained Independent", "Secured Housing"))
+         ) %>%
+  ggplot(aes(x = fct_reorder(paste(Variable, Value, sep = ": "), Percentage), y = Percentage, fill = Category)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    coord_flip() +
+    labs(title = "Comparison of Homeless Group (Unhoused vs Independent)",
+         x = "Attribute",
+         y = "Percentage") +
+    scale_y_continuous(labels = scales::percent, expand = c(0,0)) +
+    scale_fill_manual(values = c("Remained Unhoused" = graphGreen, "Secured Housing" = gotOutOfHomelessnessGreen))+
+    theme_bw() + 
+    theme(axis.text.x = element_text(size = 12),
+          axis.text.y = element_blank(),
+          legend.title = element_blank(),
+          legend.position = "blank"
+          )
+```
+
+
+```{r}
+top_20 <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  dplyr::select(-LIVARAG) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Unhoused", Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(Total = nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused")),
+         Percentage = n / Total * 100) %>%
+  arrange(desc(Percentage)) %>%
+  slice_head(n = 20) %>% 
+  dplyr::select(Variable) %>%  # Only keep the Variable column for reference
+  distinct()
+
+# Step 2: Filter to top 20 variables and keep top 3 values per variable
+recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  dplyr::select(-LIVARAG) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Unhoused", Value != "Missing/unknown/not collected/invalid") %>%
+  filter(Variable %in% top_20$Variable) %>%  # Filter by the top 20 variables
+  group_by(Variable, Value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(Total = nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused")),
+         Percentage = n / Total * 100) %>%
+  group_by(Variable) %>%
+  arrange(desc(Percentage)) %>%
+  slice_head(n = 3) %>%  # Keep top 3 levels per variable
+  ungroup()
+```
+
+```{r}
+# Step 1: Create top_20 list
+top_20 <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  dplyr::select(-LIVARAG) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Unhoused", Value != "Missing/unknown/not collected/invalid") %>%
+  group_by(Variable, Value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(Total = nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused")),
+         Percentage = n / Total * 100) %>%
+  arrange(desc(Percentage)) %>%
+  slice_head(n = 20) %>% 
+  dplyr::select(Variable) %>%  # Only keep the Variable column for reference
+  distinct()
+
+# Step 2: Apply the y_offset and color logic to top 20 variables
+recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  dplyr::select(-LIVARAG) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Value") %>%
+  filter(Value != "Unhoused", Value != "Missing/unknown/not collected/invalid",
+         Variable %in% top_20$Variable  # Filter by the top 20 variables
+  ) %>%
+  group_by(Variable, Value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(Total = nrow(recoded_tedsd_2021 %>% filter(LIVARAG == "Unhoused")),
+         Percentage = signif(n / Total * 100, 3)
+  ) %>%
+  group_by(Variable) %>%
+  mutate(rank = dense_rank(-Percentage)) %>% 
+  arrange(desc(rank), .by_group = TRUE) %>%
+  mutate(
+    adjusted_percentage = case_when(
+      rank == 3 ~ sum(Percentage[rank >= 3]),  # Sum all the ranks >= 3 and assign to rank 3
+      rank < 3 ~ Percentage,  # Keep the percentage for the first 3 ranks
+      TRUE ~ 0  # Make sure other ranks get 0 for calculation purposes
+    ),
+    cumulative = cumsum(adjusted_percentage),
+    y_offset = lag(cumulative, default = 0),  # Offset is the previous cumulative value
+    stack_height = adjusted_percentage - lag(adjusted_percentage, default = 0)  # Subtract previous percentage
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = Variable, y = stack_height, fill = factor(rank))) +
+    geom_bar(stat = "identity", position = "stack", color = "black") +
+    geom_text(aes(y = if_else(rank != 1, y_offset + stack_height / 2, adjusted_percentage - stack_height / 2),
+                  label = if_else(rank <= 3, paste0(adjusted_percentage, "%"), "")), color = "black") +
+    scale_fill_manual(values = c("1" = "blue", "2" = "green", "3" = "orange")) +
+    labs(title = "Stacked Bar Plot with Correct y_offsets", x = "Variable", y = "Percentage") +
+    theme_minimal() +
+    coord_flip() +
+    theme(legend.position = "none")
+```
+
+
+Okay, now that you understand I want you to apply EXACTLY WHAT YOU JUST DID to the following code where, just like in df there was a variable column, top_20 creates a Variable column, and just in df there was a Value column, the Value column in the code under "Step 2" creates a Value column, and just like in df there was a Percentage column, there is a Percentage column: 
+```{r}
+df <- data.frame(
+  Variable = c("VET", "VET", "VET", "VET", "MARSTAT", "MARSTAT", "MARSTAT", "GENDER", "GENDER", "GENDER", "GENDER"),
+  Value = c("1", "2", "3", "4", "Single", "Married", "Divorced", "Male", "Female", "Other", "Non-binary"),
+  Percentage = c(50, 30, 15, 5, 40, 50, 10, 45, 40, 10, 5)
+)
+
+# Step 1: Calculate the cumulative percentages to apply the y_offset idea and assign colors
+df %>%
+  group_by(Variable) %>%
+  arrange(Percentage, .by_group = TRUE) %>%
+  mutate(
+    # Rank percentages in descending order (1 = highest, 4 = lowest)
+    rank = dense_rank(-Percentage),
+    adjusted_percentage = case_when(
+      rank == 3 ~ sum(Percentage[rank >= 3]),  # Sum all the ranks > 3 and assign to rank 3
+      rank < 3 ~ Percentage,  # Keep the percentage for the first 3 ranks
+      TRUE ~ 0  # Make sure other ranks get 0 for calculation purposes
+    ),
+    cumulative = cumsum(adjusted_percentage),
+    y_offset = lag(cumulative, default = 0),  # Offset is the previous cumulative value
+    stack_height = adjusted_percentage - lag(adjusted_percentage, default = 0)  # Subtract previous percentage
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = Variable, y = stack_height, fill = factor(rank))) +
+    geom_bar(stat = "identity", position = "stack", color = "black") +
+    geom_text(aes(y = if_else(rank != 1, y_offset + stack_height / 2, adjusted_percentage - stack_height / 2), label = if_else(rank <= 3, paste0(adjusted_percentage, "%"), "")), color = "black") +
+    scale_fill_manual(values = c("1" = "blue", "2" = "green", "3" = "orange")) +
+    labs(title = "Stacked Bar Plot with Correct y_offsets", x = "Variable", y = "Percentage") +
+    theme_minimal() +
+    coord_flip() +
+    theme(legend.position = "none")
+```
+
+```{r}
+tedsd_2021_raw %>% select(EDUC, ARRESTS, NOPRIOR) %>% View()
+```
+
+
+```{r}
+transitions <- tedsd_2021 %>%
+  count(LIVARAG, LIVARAG_D) %>%
+  pivot_wider(names_from = LIVARAG_D, values_from = n, values_fill = 0)
+
+print(transitions)
+```
+# Chi Squared
+```{r}
+# predictor_vars <- recoded_tedsd_2021 %>%
+#   dplyr::select(AGE, GENDER, ETHNIC, EDUC, RACE, MARSTAT, VET, EMPLOY, EMPLOY_D, FREQ1, FREQ1_D, FRSTUSE1, DSMCRIT, PSYPROB, PSOURCE, STFIPS, HLTHINS, ARRESTS_D, NOPRIOR, SUB1, SUB2, SUB3, METHUSE, LOS, SERVICES, REASON, FREQ_ATND_SELF_HELP_D)
+# 
+# predictor_vars <-  setdiff(names(predictor_vars), "LIVARAG_D")  # Exclude the outcome variable
+library(purrr)  # For map_dfr
+
+results <- recoded_tedsd_2021 %>% 
+  select(-contains("LIVARAG")) %>%  # Exclude outcome variable
+  summarise(across(everything(), ~{
+    tbl <- table(recoded_tedsd_2021$LIVARAG_delta, .x)
+    chi_p <- chisq.test(tbl)$p.value
+    cramers_v <- assocstats(tbl)$cramer
+    tibble(Chi_Square_p = chi_p, Cramers_V = cramers_v)  # Return as tibble
+  }, .names = "{.col}")) %>%
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Results") %>%
+  unnest(Results)  # Unnest the tibble column
+
+results %>%
+  filter(Cramers_V > 0.1) %>%
+  arrange(desc(Cramers_V)) %>%
+  ggplot(aes(x = reorder(Variable, Cramers_V), y = Cramers_V, fill = Cramers_V)) +
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    scale_fill_gradient(low = "blue", high = "red") +
+    labs(title = "Effect Sizes of Key Attributes",
+         x = "Variable",
+         y = "Cramér's V (Effect Size)") +
+    theme_minimal()
+```
+
+
+# PCA Yipeee!
+
+```{r}
+set.seed(123)  # For reproducibility
+sample_size <- 1000 
+allValues <- recoded_tedsd_2021 %>%
+  select(-LIVARAG, -LIVARAG_delta, -EMPLOY, -SELF_HELP_GROUP, -NUM_ARRESTS, -FRSTUSE1) %>% 
+  pivot_longer(
+    cols = everything(), # Select columns to pivot
+    names_to = "Variable",      # New column for original column names
+    values_to = "Value"         # New column for values
+  )
+PCAUnhoused <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  filter(if_all(everything(), ~ . != "Missing/unknown/not collected/invalid")) %>%
+  mutate(across(everything(), as.factor)) %>%
+  mutate(ID = row_number())  # Create an explicit ID column
+
+# Keep LIVARAG_delta separately with ID for merging later
+PCAUnhoused_LIVARAG_delta <- PCAUnhoused %>%
+  select(ID, LIVARAG_delta)
+
+PCAUnhoused <- PCAUnhoused %>%
+  select(-LIVARAG, -LIVARAG_delta, -EMPLOY, -SELF_HELP_GROUP, -NUM_ARRESTS, -FRSTUSE1) 
+PCAUnhousedSub <- PCAUnhoused %>%
+  sample_n(min(sample_size, nrow(PCAUnhoused)))
+
+Unhoused_LIVARAG_delta <- PCAUnhousedSub %>%
+  left_join(PCAUnhoused_LIVARAG_delta, by = "ID") %>% select(LIVARAG_delta)
+
+PCAUnhousedSub %>% select(-ID)
+
+mca_resultUnhousedSub <- MCA(PCAUnhousedSub, graph = FALSE)
+fviz_mca_biplot(mca_resultUnhousedSub,
+                repel = TRUE,         # Avoid overlapping labels
+                col.var = "red",      # Loadings (categories) in red
+                col.ind = "blue",
+                label = "var") +   # Individuals (cases) in blue
+  labs(title = "MCA Biplot of Unhoused") +
+  theme_bw()
+
+mca_result_filtered <- MCA(PCAUnhoused_filtered, graph = FALSE)
+
+fviz_mca_biplot(mca_result_filtered, 
+                repel = TRUE, 
+                col.var = "red", 
+                col.ind = "blue",
+                label = "var") +
+  labs(title = "MCA Biplot (Top Contributing Variables)")
+
+
+PCAIndependent <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Independent living") %>%
+  select(-LIVARAG, -LIVARAG_delta, -EMPLOY, -SELF_HELP_GROUP, -NUM_ARRESTS, -FRSTUSE1) %>% 
+  filter(if_all(everything(), ~ . != "Missing/unknown/not collected/invalid")) %>%
+  mutate(across(everything(), as.factor))
+
+PCAIndependentSub <- PCAIndependent %>%
+  sample_n(min(sample_size, nrow(PCAIndependent)))
+
+
+
+# important_vars <- names(sort(mca_resultUnhoused$var$contrib[, 1], decreasing = TRUE)[1:10])
+# allValues %>%
+#   filter(Value %in% important_vars) %>% distinct() %>% select(Variable)
+PCAUnhoused_filtered <- PCAUnhousedSub %>%
+  select(STFIPS, SERVICES, DSMCRIT, LENGTHofSTAY, SELF_HELP_GROUP_D, EMPLOY_D)
+
+mca_resultIndependentSub <- MCA(PCAIndependentSub, graph = FALSE)
+fviz_mca_biplot(mca_resultIndependentSub,
+                repel = TRUE,         # Avoid overlapping labels
+                col.var = "red",      # Loadings (categories) in red
+                col.ind = "blue", # Individuals (cases) in blue
+                label = "var") +
+  labs(title = "MCA Biplot of Independent Living") +
+  theme_bw()
+```
+
+```{r}
+ind_coordsUnhoused <- mca_result_filtered$ind$coord %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "ID") %>%
+  mutate(Group = Unhoused_LIVARAG_delta)
+length(PCAUnhousedSub_LIVARAG_delta)
+# Process variable category coordinates
+var_coordsUnhoused <- mca_result_filtered$var$coord %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Category")
+
+# Create the ggplot
+ggplot() +
+  geom_point(data = ind_coordsUnhoused, aes(x = `Dim 1`, y = `Dim 2`, color = Group$LIVARAG_delta), alpha = 0.7) +  # Individuals with color
+  # geom_text(data = var_coordsUnhoused, aes(x = `Dim 1`, y = `Dim 2`, label = Category), color = "red", size = 4) +  # Categories
+  labs(title = "Unhoused: MCA Biplot",
+       x = "Dimension 1",
+       y = "Dimension 2") +
+  theme_minimal()
+```
+
+
+```{r}
+library(FactoMineR)
+library(factoextra)
+
+as.data.frame(mca_resultUnhoused$var$contrib) %>%
+  rownames_to_column(var = "Variable") %>%
+  select(Variable, `Dim 1`) %>%
+  arrange(desc(`Dim 1`)) %>%
+  slice(1:10) %>%
+  ggplot(aes(x = reorder(Variable, `Dim 1`), y = `Dim 1`, fill = `Dim 1`)) +
+  geom_bar(stat = "identity", show.legend = FALSE, fill = graphGreen) +
+    coord_flip() +  # Flip for readability
+    labs(title = "Unhoused: Top 10 Variable Contributions to Dim 1",
+         x = "Variable",
+         y = "Contribution (%)") +
+    # scale_fill_gradient(low = "blue", high = "red") +
+    theme_minimal()
+
+as.data.frame(mca_resultUnhoused$var$contrib) %>%
+  rownames_to_column(var = "Variable") %>%
+  select(Variable, `Dim 2`) %>%
+  arrange(desc(`Dim 2`)) %>%
+  slice(1:10) %>%
+  ggplot(aes(x = reorder(Variable, `Dim 2`), y = `Dim 2`)) + # , fill = `Dim 2`)) +
+  geom_bar(stat = "identity", show.legend = FALSE, fill = graphGreen) +
+    coord_flip() +  # Flip for readability
+    labs(title = "Unhoused: Top 10 Variable Contributions to Dim 2",
+         x = "Variable",
+         y = "Contribution (%)") +
+    # scale_fill_gradient(low = "blue", high = "red") +
+    theme_minimal()
+
+# ~~~~~~~~~~~~~~~~~~~~~ Independent
+
+PCAIndependent <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Independent living") %>%
+  select(-LIVARAG, -LIVARAG_delta, -EMPLOY, -SELF_HELP_GROUP, -NUM_ARRESTS, -FRSTUSE1) %>% 
+  filter(if_all(everything(), ~ . != "Missing/unknown/not collected/invalid")) %>%
+  mutate(across(everything(), as.factor))
+
+# mca_resultIndependent <- MCA(PCAIndependent, graph = FALSE)
+# fviz_mca_biplot(mca_resultIndependent, 
+#                 repel = TRUE,         # Avoid overlapping labels
+#                 col.var = "red",      # Loadings (categories) in red
+#                 col.ind = "blue") +   # Individuals (cases) in blue
+#   labs(title = "MCA Biplot of recoded_tedsd_2021") +
+#   theme_minimal()
+
+# as.data.frame(mca_resultIndependent$var$contrib) %>% 
+#   rownames_to_column(var = "Variable") %>%
+#   select(Variable, `Dim 1`) %>%
+#   arrange(desc(`Dim 1`)) %>%
+#   slice(1:10) %>%
+#   ggplot(aes(x = reorder(Variable, `Dim 1`), y = `Dim 1`)) +
+#   geom_bar(stat = "identity", show.legend = FALSE, fill = graphOrange) +
+#     coord_flip() +  # Flip for readability
+#     labs(title = "Independent: Top 10 Variable Contributions to Dim 1",
+#          x = "Variable",
+#          y = "Contribution (%)") +
+#     # scale_fill_gradient(low = "blue", high = "red") +
+#     theme_minimal()
+# 
+# as.data.frame(mca_resultIndependent$var$contrib) %>% 
+#   rownames_to_column(var = "Variable") %>%
+#   select(Variable, `Dim 2`) %>%
+#   arrange(desc(`Dim 2`)) %>%
+#   slice(1:10) %>%
+#   ggplot(aes(x = reorder(Variable, `Dim 2`), y = `Dim 2`, fill = `Dim 2`)) +
+#   geom_bar(stat = "identity", show.legend = FALSE, fill = graphOrange) +
+#     coord_flip() +  # Flip for readability
+#     labs(title = "Independent: Top 10 Variable Contributions to Dim 2",
+#          x = "Variable",
+#          y = "Contribution (%)") +
+#     # scale_fill_gradient(low = "blue", high = "red") +
+#     theme_minimal()
+```
+
+# Another attempt at PCA for more traditional Biplot
+
+```{r}
+sample_size <- 1000 
+allValues <- recoded_tedsd_2021 %>%
+  select(-LIVARAG, -LIVARAG_delta, -EMPLOY, -SELF_HELP_GROUP, -NUM_ARRESTS, -FRSTUSE1) %>% 
+  pivot_longer(
+    cols = everything(), # Select columns to pivot
+    names_to = "Variable",      # New column for original column names
+    values_to = "Value"         # New column for values
+  )
+PCAUnhoused <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Unhoused") %>%
+  filter(if_all(everything(), ~ . != "Missing/unknown/not collected/invalid")) %>%
+  mutate(across(everything(), as.factor))
+
+PCAUnhousedSub <- PCAUnhoused %>%
+  sample_n(min(sample_size, nrow(PCAUnhoused)))
+
+res.mca <- MCA(PCAUnhoused, graph = FALSE)
+```
+
+```{r}
+var_contrib <- data.frame(res.mca$var$contrib)
+var_contrib$Category <- rownames(var_contrib)
+
+# Set a threshold for contributions (e.g., top 20%)
+threshold <- quantile(var_contrib$Dim.1, 0.90) # Adjust for desired number of variables
+
+# Filter only high-contributing variables
+top_vars <- var_contrib[var_contrib$Dim.1 > threshold | var_contrib$Dim.2 > threshold, ]
+
+# Extract their coordinates
+filtered_var_coords <- as.data.frame(res.mca$var$coord)
+filtered_var_coords$Category <- rownames(filtered_var_coords)
+filtered_var_coords <- filtered_var_coords[filtered_var_coords$Category %in% top_vars$Category, ]
+
+
+library(ggrepel)
+
+ggplot() +
+  geom_segment(data = filtered_var_coords, 
+               aes(x = 0, y = 0, xend = `Dim 1`, yend = `Dim 2`),
+               arrow = arrow(length = unit(0.2, "inches")), 
+               color = graphGreen) +
+  geom_text_repel(data = filtered_var_coords, 
+                  aes(`Dim 1`, `Dim 2`, label = Category), 
+                  max.overlaps = Inf, # Ensures all labels are shown
+                  box.padding = 0.5,  # Adjusts distance between labels
+                  point.padding = 0.3) +
+  theme_minimal() +
+  labs(title = "Filtered MCA Biplot", x = "Dimension 1", y = "Dimension 2")
+```
+```{r}
+PCAIndependent <- recoded_tedsd_2021 %>%
+  filter(LIVARAG == "Independent living") %>%
+  filter(if_all(everything(), ~ . != "Missing/unknown/not collected/invalid")) %>%
+  mutate(across(everything(), as.factor))
+
+res.mca2 <- MCA(PCAIndependent, graph = FALSE)
+
+var_contrib <- data.frame(res.mca2$var$contrib)
+var_contrib$Category <- rownames(var_contrib)
+
+# Set a threshold for contributions (e.g., top 20%)
+threshold <- quantile(var_contrib$Dim.1, 0.89) # Adjust for desired number of variables
+
+# Filter only high-contributing variables
+top_vars <- var_contrib[var_contrib$Dim.1 > threshold | var_contrib$Dim.2 > threshold, ]
+
+# Extract their coordinates
+filtered_var_coords <- as.data.frame(res.mca2$var$coord)
+filtered_var_coords$Category <- rownames(filtered_var_coords)
+filtered_var_coords <- filtered_var_coords[filtered_var_coords$Category %in% top_vars$Category, ]
+
+filtered_var_coords <- filtered_var_coords %>%
+  mutate(Category = str_replace(Category,"^SELF_HELP_GROUP_[D]?[_]?|^EMPLOY_[D]?[_]?|^LIVARAG_D_", ""))
+
+library(ggrepel)
+
+ggplot() +
+  geom_segment(data = filtered_var_coords, 
+               aes(x = 0, y = 0, xend = `Dim 1`, yend = `Dim 2`),
+               arrow = arrow(length = unit(0.2, "inches")), 
+               color = graphOrange) +
+  geom_text_repel(data = filtered_var_coords, 
+                  aes(`Dim 1`, `Dim 2`, label = Category), 
+                  max.overlaps = Inf, # Ensures all labels are shown
+                  box.padding = 0.5,  # Adjusts distance between labels
+                  point.padding = 0.3) +
+  theme_minimal() +
+  labs(title = "Filtered MCA Biplot", x = "Dimension 1", y = "Dimension 2")
+```
+

@@ -1,0 +1,35 @@
+project:
+  type: website
+
+website:
+  title: "milesLV.github.io"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: projects.qmd
+        text: Projects
+        
+    right:
+      - icon: envelope
+        href: mailto:mlibbeyv@gmail.com
+      - icon: linkedin
+        href: "https://linkedin.com/in/miles-libbey-v"
+      - icon: github
+        href: "https://github.com/milesLV"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    page-footer:
+      left: |
+        &copy; [name], 2025<br>
+        All content licensed under <i class='bi-badge-cc'></i>
+        [(CC BY-NC-SA 4.0)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+      right: |
+        Site built with <a href='https://quarto.org/'>Quarto</a>
+
+editor: source
+

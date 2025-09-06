@@ -1,0 +1,73 @@
+---
+title: "Housing Status Changes in Substance Abuse Treatment"
+author: "Miles Libbey V"
+image: capstoneIcon.png
+categories: 
+  - University
+  - R
+  - Python
+format: html
+---
+
+This project was a one of 3 subsets of a larger project done for the Senior Capstone class *Projects In Data Science* aimed at analyzing SAMHSA's TEDS-D (Treatment Episodic Data Set-Discharges) 2021 file in seeing how vital quality of life influences– employment status, housing status, and frequency of substance use– changed throughout the time substance abuse facility clients' stay. This was accomplished from use of 2 time interval variables measuring the same aspect. For example, EMPLOY and EMPLOY_D measured employment at admission and employment at departure respectively.
+
+Specifically, this project set out to answer the question, **What are the key differences in the characteristics of people whose living arrangements do or do Not change after treatment?** In order to provide evidence, it dove into what the composite differences were between those who remained unhoused and those who went from being unhoused to living independently (with a slight interest in looking at those who came in living independently and became unhoused, only 0.6% of clients). This was all done in R, with some use of Python for running models unavailable in R (CatBoost and retreiving the SHAP values of those).
+
+-   Build story
+
+    -   Give context of project
+
+-   Include models / key visuals
+
+    -   CatBoost + SHAP
+
+        -   Brief why CatBoost and what they both show
+
+    -   MCA + biplots (maybe just exclude a couple of less meaningful variables for legibility)
+
+![](basicAdmissionPlot.png){.lightbox fig-align="center" width="347"}
+
+![](capstoneIcon.png){.lightbox fig-align="center" width="600"}
+
+## CatboostClassifier
+
+CatBoost is a gradient boosting model (like LightGM and XGBoost) that has a special CatBoost target encoding that makes it shine above the others for this project. Its unique target encoding allows for more effective and efficient predictions with categorical data, which is the datatype of 97% of the columns.
+
+``` python
+X = teds_Unhoused.drop(columns=["LIVARAG_delta"]) 
+X = X.astype(str)
+y = teds_Unhoused["LIVARAG_delta"] 
+
+train_pool = Pool(X, label=y, cat_features=X.columns.tolist())
+
+modelUnhoused = CatBoostClassifier(iterations=700, 
+                           depth=8, 
+                           learning_rate=0.2, 
+                           loss_function='Logloss', 
+                           eval_metric='AUC', 
+                           verbose=70)
+
+modelUnhoused.fit(train_pool)
+```
+
+![](images/catBoostMeasures.png){.lightbox fig-align="center" width="269"}
+
+![](images/unhousedMatrix.png){.lightbox fig-align="center" width="428"}
+
+### Shap Values
+
+![SHAP values give a little insight into how variables actually sway the classifier's decision. In this plot, every dot is representative of one case, or one client. The further right a dot is, the higher probability of the client changing from unhoused to house is and vice versa. Since every dot is a single person, those humps are all people, so it is easy to spot that there are many groups in the variables. What is important to see is that there is a trend for these variables to leaning towards the right, with many large humps and tails being there. However, these variables aren't just univariate and some have good sized humps on the left like in the case of State and Length of Stay. The next model gives insight into which models are more likely to be doing this.](images/SHAPValues.png){.lightbox fig-align="center" width="427"}
+
+![](images/MCABiplot-01.png){.lightbox fig-align="center" width="636"}
+
+\- Include thank you's to experts
+
+### Works Cited {style="text-align: center;"}
+
+Brubaker, Michael D., et al. “Barriers and Supports to Substance Abuse Service Use among Homeless Adults.” Journal of Addictions & Offender Counseling, vol. 34, no. 2, Oct. 2013, pp. 81–98, [https://doi.org/10.1002/j.2161-1874.2013.00017.x.](https://doi.org/10.1002/j.2161-1874.2013.00017.x) Accessed 24 October. 2024.
+
+Nicholls, Melanie J., and Lianne A. Urada. “Homelessness and Polysubstance Use: A Qualitative Study on Recovery and Treatment Access Solutions around an Urban Library in Southern California, USA.” Health & Social Care in the Community, vol. 30, no. 1, 14 May 2021, <https://doi.org/10.1111/hsc.13424>.
+
+Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data
+
+Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <https://www.samhsa.gov/data/>.

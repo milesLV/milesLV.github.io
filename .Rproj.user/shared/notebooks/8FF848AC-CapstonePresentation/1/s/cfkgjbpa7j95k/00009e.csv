@@ -1,0 +1,4 @@
+"0","          # axis.title.x.bottom = element_text(size = 10))
+ggsave(""basicAdmissionPlot.png"")
+"
+"2","[38;5;232mSaving 7 x 7 in image[39m"

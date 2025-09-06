@@ -1,0 +1,35 @@
+{
+  "index.qmd": {
+    "index.html": "79c84f8f"
+  },
+  "projects.qmd": {
+    "projects.html": "9f3516f3"
+  },
+  "about.qmd": {
+    "about.html": "8cb78b07"
+  },
+  "projects/capstonePortfolio/index.qmd": {
+    "index.html": "2ef04868"
+  },
+  "projects/madridMetro/index.qmd": {
+    "index.html": "13a9647b"
+  },
+  "projects/KnightTourVisual/index.qmd": {
+    "index.html": "09602fb4"
+  },
+  "projects/KnightTourVisual/app.qmd": {
+    "app.html": "351c69b9"
+  },
+  "projects/LonelinessProject/index.qmd": {
+    "index.html": "9c9faef9"
+  },
+  "projects/NonProfitMapper/index.qmd": {
+    "index.html": "955b79ce"
+  },
+  "cv.qmd": {
+    "cv.html": "f0a210b8"
+  },
+  "CV.qmd": {
+    "CV.html": "e5aa69f9"
+  }
+}

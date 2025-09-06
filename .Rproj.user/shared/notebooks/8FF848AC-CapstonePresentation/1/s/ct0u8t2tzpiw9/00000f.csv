@@ -1,0 +1,28 @@
+"0","modelDataSubset <- tedsd_2021 %>%"
+"0","  mutate(SUB2 = ifelse(SUB2 == 1, 1, 0)) %>%"
+"0","  mutate(SUB3 = ifelse(SUB3 == 1, 1, 0)) %>%"
+"0","  mutate(SERVICES = case_when("
+"0","  SERVICES == 1 | SERVICES == 2 ~ ""Detox, 24 hour"","
+"0","  SERVICES == 3 | SERVICES == 4 | SERVICES == 5 ~ ""Rehab/Residential"","
+"0","  SERVICES == 6 | SERVICES == 7 | SERVICES == 8 ~ ""Ambulatory"""
+"0","  )) %>%"
+"0","  mutate(LIVARAG_delta = case_when( "
+"0","    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Unhoused"" ~ ""Same"","
+"0","    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Dependent Living"" ~ ""Improved"","
+"0","    LIVARAG == ""Unhoused"" & LIVARAG_D == ""Independent Living"" ~ ""Improved"","
+"0","    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Unhoused"" ~ ""Worse"","
+"0","    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Dependent Living"" ~ ""Same"","
+"0","    LIVARAG == ""Dependent Living"" & LIVARAG_D == ""Independent Living"" ~ ""Improved"","
+"0","    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Unhoused"" ~ ""Worse"","
+"0","    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Dependent Living"" ~ ""Worse"","
+"0","    LIVARAG == ""Independent Living"" & LIVARAG_D == ""Independent Living"" ~ ""Same"""
+"0","  )) %>%"
+"0","  mutate(LIVARAG_delta = factor(LIVARAG_delta, levels = c(""Improved"", ""Same"", ""Worse""))) %>%"
+"0","  dplyr::select(LIVARAG_delta, AGE, GENDER, ETHNIC, EDUC, RACE, MARSTAT, VET, LIVARAG, EMPLOY, EMPLOY_D, FREQ1, FREQ1_D, FRSTUSE1, DSMCRIT, PSYPROB, PSOURCE, STFIPS, HLTHINS, ARRESTS_D, NOPRIOR, SUB1, SUB2, SUB3, METHUSE, LOS, SERVICES, REASON, FREQ_ATND_SELF_HELP_D)"
+"1","[1m[33mError[39m in `dplyr::select()`:[22m
+[33m![39m Can't select columns that don't exist.
+[31m✖[39m Column `REASON` doesn't exist.
+Backtrace:
+[90m 1. [39m... %>% ...
+[90m 3. [39m[1m[94mdplyr:::select.data.frame([39m[22m...[1m[94m)[39m[22m
+"

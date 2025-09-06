@@ -1,0 +1,27 @@
+"0","tedsd_2021_alluvial %>%
+  group_by(LIVARAG, LIVARAG_D) %>%
+  summarize(count = n(), .groups = 'drop') %>%
+  group_by(LIVARAG) %>%
+  mutate(total = sum(count)) %>%
+  ungroup() %>%
+  mutate(percentage = count / total * 100) %>%
+  ggplot(aes(axis1 = LIVARAG, axis2 = LIVARAG_D, y = percentage)) +
+    geom_alluvium(aes(fill = LIVARAG)) +
+    geom_stratum() +
+    geom_text(stat = ""stratum"", aes(label = after_stat(stratum))) +
+    scale_x_discrete(limits = c(""Admission"", ""Discharge""), expand = c(.12, .12)) +
+    scale_fill_manual(values = c(graphOrange, graphBlue, graphGreen)) +
+    labs(title = ""Living Arrangements at Admission and Discharge by Substance"",
+         y = ""Percentage"",
+         x = NULL) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(size = 14),
+          axis.text.y = element_text(size = 14), 
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16), 
+          plot.title = element_text(size = 18, face = ""bold""),
+          strip.text = element_text(size = 18),
+          legend.position = ""none""
+    )
+"
+"2","Warning: The working directory was changed to /Users/miles5 inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks."

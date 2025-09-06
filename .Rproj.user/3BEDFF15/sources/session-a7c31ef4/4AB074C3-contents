@@ -1,0 +1,185 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(stringr)
+library(ggplot2)
+```
+
+# Just make Combinations of stuff in List
+```{r}
+# combinators <- c("carat", "cut", "clarity", "color")
+# start = 10
+# end = FALSE
+# minLength = 4
+# maxLength = 4
+# collapse = ", "
+makeCombinations <- function(combinators, start = 1, end = FALSE, minLength = 1, maxLength = FALSE, collapse = ", "){
+  combinations <- str_c(unlist(lapply(1:length(combinators), function(n) {
+  combn(combinators, n, FUN = function(x) paste(x, collapse = collapse), simplify = TRUE)
+})))
+  length <- length(combinations)
+  if (end != FALSE) {
+    if (end > length) {
+      print(str_c("Your max value of ", end," is too large for the total number of combinations (", length,") and was truncated to that amount"))
+      end <- length
+    }
+      combinations <- combinations[start:end]
+  } else {
+      combinations <- combinations[start:length]
+  }
+  
+  if (maxLength != FALSE) {
+    numCombinators <- length(combinators)
+    if (maxLength > numCombinators) {
+      print(str_c("Your maxLength value of ", maxLength, " is too large for the total number of actual unique values (", numCombinators,") and was truncated to that amount"))
+      maxLength <- numCombinators
+    }
+      combinations <- combinations[str_count(combinations, collapse) +1 >= minLength & str_count(combinations, collapse) +1 <= maxLength]
+  }
+  return(combinations)
+}
+makeCombinations(c("carat", "cut", "clarity", "color"), start = 10, minLength = 4, maxLength = 4)
+```
+
+# All Formula Combinations of Predictors + Output
+```{r}
+predictors <- c("carat", "cut", "clarity", "color")
+outcome <- "price"
+start = 1
+end = FALSE
+minLength = 2
+maxLength = 2
+operation = " + "
+makeFormulasCombinations <- function(outcome, predictors, operation = " + ", start = 1, end = FALSE, minLength = 1, maxLength = FALSE) {
+ formulas <- str_c(outcome, " ~ ", unlist(lapply(1:length(predictors), function(n) {
+    combn(predictors, n, FUN = function(x) paste(x, collapse = operation), simplify = TRUE)
+  })))
+  length <- length(formulas)
+  if (end != FALSE) {
+    if (end > length) {
+      print(str_c("Your max value of ", end," is too large for the total number of combinations (", length,") and was truncated to that amount"))
+      end <- length
+    }
+      formulas <- formulas[start:end]
+  } else {
+      formulas <- formulas[start:length]
+  }
+  
+  if (maxLength != FALSE) {
+    numPredictors <- length(predictors)
+    
+    if (maxLength > numPredictors) {
+      print(str_c("Your maxLength value of ", maxLength, " is too large for the total number of actual unique values (", numPredictors,") and was truncated to that amount"))
+      maxLength <- numPredictors
+    }
+    formulas <- formulas[str_count(formulas, fixed(operation)) +1 >= minLength & str_count(formulas, fixed(operation)) +1 <= maxLength]
+  }
+  return(lapply(formulas, as.formula))
+}
+makeFormulasCombinations("price", c("carat", "cut", "clarity", "color"), start = 1, minLength = 1, maxLength = 3) # combinations = n! / k!(n-k)!, \sum_{k=1}^n (n,k); \sum_{k=1}^4 (4,k) = 15 formulas
+```
+
+```{r}
+makeGroupedFormulaCombinations <- function(outcome, predictor_groups, operation = " + ") {
+  n_groups <- length(predictor_groups)
+  formulas <- list()
+  
+  # Loop through all possible non-empty combinations of groups
+  for (k in 1:n_groups) {
+    # Get all combinations of indices for groups of size k
+    group_combos <- combn(1:n_groups, k, simplify = FALSE)
+    
+    for (combo in group_combos) {
+      # For each selected group, collapse its predictors into a single string
+      group_strings <- sapply(predictor_groups[combo], function(grp) {
+        paste(grp, collapse = operation)
+      })
+      # Combine the collapsed groups with the operation
+      formula_rhs <- paste(group_strings, collapse = operation)
+      # Build the full formula as a string and convert to a formula object
+      formula_str <- paste(outcome, "~", formula_rhs)
+      formulas <- c(formulas, list(as.formula(formula_str)))
+    }
+  }
+  
+  return(formulas)
+}
+
+# Example usage:
+group1 <- c("opinion", "vote")
+group2 <- c("name", "birthday", "state")
+group3 <- c("yea", "alright", "fantastic", "good")
+
+# Pass the groups as a list
+formulas <- makeGroupedFormulaCombinations("donation", list(group1, group2, group3))
+formulas
+```
+
+## Numerical Combinations
+```{r}
+generate_num_combs <- function(ops, nums) {
+  # Convert to numeric if character
+  nums <- as.numeric(nums)
+
+  # Generate all permutations of numbers
+  permute <- function(v) {
+    if (length(v) == 1) return(list(v))
+    out <- list()
+    for (i in seq_along(v)) {
+      rest <- v[-i]
+      for (p in permute(rest)) {
+        out <- append(out, list(c(v[i], p)))
+      }
+    }
+    return(out)
+  }
+
+  # Parse operations into functions
+  parse_op <- function(op_string) {
+    if (op_string == "+") {
+      return(function(x) x)
+    } else if (op_string == "-") {
+      return(function(x) -x)
+    } else if (grepl("^\\^", op_string)) {
+      n <- as.numeric(sub("^\\^", "", op_string))
+      return(function(x) x^n)
+    } else if (grepl("^/", op_string)) {
+      n <- as.numeric(sub("^/", "", op_string))
+      return(function(x) x / n)
+    } else {
+      stop(paste("Unknown operation:", op_string))
+    }
+  }
+
+  # Convert all ops to functions
+  op_funcs <- lapply(ops, parse_op)
+
+  # Get all combinations of operations (each element gets an op)
+  op_combos <- expand.grid(rep(list(seq_along(op_funcs)), length(nums)))
+  
+  # Generate number permutations
+  num_perms <- permute(nums)
+
+  result <- list()
+
+  for (perm in num_perms) {
+    for (i in 1:nrow(op_combos)) {
+      indices <- as.integer(op_combos[i, ])
+      funcs <- op_funcs[indices]
+      transformed <- mapply(function(f, x) f(x), funcs, perm)
+      result <- append(result, list(transformed))
+    }
+  }
+
+  return(result)
+}
+```
+
