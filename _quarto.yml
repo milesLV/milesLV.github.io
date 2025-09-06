@@ -5,7 +5,7 @@ resources:
   - Miles_LibbeyV_Resume_2025.pdf
 
 website:
-  title: "Miles Libbey V"
+  title: "milesLV.github.io"
   navbar:
     left:
       - href: index.qmd
