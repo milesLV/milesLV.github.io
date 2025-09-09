@@ -5,7 +5,7 @@ resources:
   - Miles_LibbeyV_Resume_2025.pdf
 
 website:
-  title: "milesLV.github.io"
+  title: "Miles Libbey V"
   navbar:
     left:
       - href: index.qmd
@@ -25,9 +25,10 @@ website:
 
 format:
   html:
-    theme: cosmo
+    theme: lumen
     css: styles.css
     toc: true
+    page-layout: article
     page-footer:
       left: |
         &copy; [name], 2025<br>
