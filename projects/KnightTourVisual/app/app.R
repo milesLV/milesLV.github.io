@@ -1,21 +1,17 @@
 library(tidyverse)
 library(Matrix)
-library(purrr)
-library(expm)
 library(grid)
 library(ggplot2)
-library(stringr)
 library(shiny)
-library(rsconnect)
+library(shinylive)
+library(httpuv)
+library(munsell)
 
 '%notin%' <- Negate('%in%')
 
-
 generate_combinations <- function(ops, nums) {
-  # Convert to numeric if character
   nums <- as.numeric(nums)
   
-  # Generate all permutations of numbers
   permute <- function(v) {
     if (length(v) == 1) return(list(v))
     out <- list()
@@ -28,7 +24,6 @@ generate_combinations <- function(ops, nums) {
     return(out)
   }
   
-  # Parse operations into functions
   parse_op <- function(op_string) {
     if (op_string == "+") {
       return(function(x) x)
@@ -45,13 +40,8 @@ generate_combinations <- function(ops, nums) {
     }
   }
   
-  # Convert all ops to functions
   op_funcs <- lapply(ops, parse_op)
-  
-  # Get all combinations of operations (each element gets an op)
   op_combos <- expand.grid(rep(list(seq_along(op_funcs)), length(nums)))
-  
-  # Generate number permutations
   num_perms <- permute(nums)
   
   result <- list()
@@ -68,7 +58,6 @@ generate_combinations <- function(ops, nums) {
   return(result)
 }
 
-# generate_combinations(c("+", "-"), c(1, 2))
 makeKnightMoves <- function(position, board_dims = c(8,8)) {
   position <- as.numeric(position)
   numRows <- board_dims[1]
@@ -80,7 +69,6 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
     return(rowInBounds && colInBounds)
   }
   
-  # Validate input
   if (!ifValid(position)) {
     stop("Please enter values within board dimensions")
   }
@@ -90,16 +78,40 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
     if (ifValid(newPosition)) {
       return(newPosition)
     } else {
-      return(NULL)
+      return(invisible())
     }
   })
-  
-  return(compact(movesList))
+  movesList[sapply(movesList, is.null)] <- NULL
+  return(movesList)
 }
 
 makeKnightMoves(c(8,7), c(8,7))
 
-#1\space\space\space\space 2\space\space\space\space3\space\space\space\space4\\
+matrix_power <- function(A, n) {
+  if (!is.matrix(A) || ncol(A) != nrow(A)) {
+    stop("A must be a square matrix")
+  }
+  if (!is.numeric(n) || length(n) != 1 || floor(n) != n) {
+    stop("Exponent n must be a single integer")
+  }
+  
+  if (n == 0) return(diag(nrow(A)))
+  if (n < 0) {
+    A <- solve(A)
+    n <- -n
+  }
+  result <- diag(nrow(A))
+  base <- A
+  while (n > 0) {
+    if (n %% 2 == 1) {
+      result <- result %*% base
+    }
+    base <- base %*% base
+    n <- n %/% 2
+  }
+  result
+}
+
 makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
   cellTotal <- numRow * numCol
   A <- matrix(0, nrow = cellTotal, ncol = cellTotal)
@@ -115,21 +127,19 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
         moveRow <- move[1]
         moveCol <- move[2]
         
-        if (moveRow <= numRow && moveCol <= numCol) { # if it's in the board
+        if(moveRow <= numRow && moveCol <= numCol) {
           to_index <- index_from_coords(moveRow, moveCol)
           A[from_index, to_index] <- 1
-          A[to_index, from_index] <- 1  # undirected
+          A[to_index, from_index] <- 1
         }
       }
     }
   }
   
-  # return(as(A, "sparseMatrix"))
   return(A)
 }
 
 plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, exponent = 1, showPathsToExponent = FALSE, probability = FALSE) {
-  
   if (length(position) != 2 || 
       !all(position >= 1) || 
       position[1] > nrows || 
@@ -142,19 +152,17 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
   if(showPathsToExponent && exponent != 1) {
     ATotal <- A
     for (i in 2:exponent) {
-      ATotal <- ATotal + A %^% i
+      ATotal <- ATotal + matrix_power(A, i)
       
     }
     A <- ATotal
   } else {
-    A <- A %^% exponent # exponentiating
+    A <- matrix_power(A, exponent)
   }
   
-  # Convert origin to matrix index
   origin_index <- (position[1] - 1) * ncols + position[2]
   path_counts <- A[origin_index, ]
   
-  # Map index → coordinates
   grid <- expand.grid(x = 1:ncols, y = 1:nrows)
   grid$index <- (grid$y - 1) * ncols + grid$x
   grid$paths <- path_counts[grid$index]
@@ -166,14 +174,13 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
              paths = paths / totalPaths)
   }
   grid <- grid %>%
-    mutate(numDigits = ifelse(str_detect(paths, "^0\\."), 
+    mutate(numDigits = ifelse(grepl("^0\\.", paths),
                               nchar(paths) - 3,
                               nchar(paths)),
            pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
                                    format(signif(paths, 3), scientific = TRUE), 
                                    paths))
   
-  # Label the origin
   grid$Type <- ifelse(grid$index == origin_index, "Origin", "Other")
   origin_tile <- grid %>% filter(Type == "Origin")
   
@@ -181,7 +188,6 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
   knightGrob <- rasterGrob(knightImage, interpolate = TRUE)
   
   readable = 16
-  # Plot
   ggplot(grid, aes(x = x, y = y, fill = paths)) +
     geom_tile(color = "grey60") +
     annotation_custom(
@@ -203,7 +209,7 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
                                    4.5))
     ) +
     coord_fixed() +
-    labs(title = str_c("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
+    labs(title = paste0("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
     guides(fill = guide_colorbar(barwidth = 25, barheight = 3)) + 
     theme_minimal() +
     theme(legend.position = "bottom",
@@ -218,16 +224,15 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
           legend.title = element_text(size = readable+2)
     )
 }
-# plotKnightFromMatrix(c(6,5), 8, 6, exponent = 1, showPathsToExponent = TRUE, probability = TRUE)
 
 ui <- fluidPage(
-  sidebarLayout( # all of the input bars
+  sidebarLayout(
     sidebarPanel(
       div(
         style = "font-size: 24px; font-weight: bold; margin-top: 0px;",
         textOutput("textBox")
       ),
-      sliderInput("exponent", # id
+      sliderInput("exponent",
                   label = "Choose # of Consecutive Jumps",
                   min = 1,
                   max = 25,
@@ -249,10 +254,11 @@ ui <- fluidPage(
                    label = "Show Pathing Squares?",
                    choices = list("Yes" = TRUE, "No" = FALSE),
                    selected = TRUE),
-      radioButtons("mode", # make probability of count
+      radioButtons("mode",
                    label = "Number Mode",
                    choices = list("Count" = FALSE, "Probability" = TRUE),
-                   selected = FALSE)
+                   selected = FALSE),
+      actionButton("toggleAnimate", "Toggle Auto Animate", class = "btn-primary")
     ),
     mainPanel(
       plotOutput("knightPlot", click = "plot_click", width = "100%")
@@ -260,68 +266,21 @@ ui <- fluidPage(
   )
 )
 
-# Server logic to receive inputs
 server <- function(input, output, session) {
   pos <- reactiveVal(c(5, 5))
   text <- reactiveVal("Click any square to move the knight")
-  
-  # === Reactive value to track last activity time ===
-  lastActivity <- reactiveVal(Sys.time())
-  
-  # === Track whether auto animation is active ===
   autoAnimate <- reactiveVal(FALSE)
+  lastProgrammatic <- reactiveVal(NULL)
   
-  # === Timestamp for programmatic changes to input$exponent ===
-  lastProgrammatic <- reactiveVal(NULL)  # store Sys.time() for programmatic updates
-  progIgnoreWindow <- 0.6                # seconds: window to treat exponent changes as programmatic
-  
-  # === Observe non-exponent inputs for activity (these are always user interactions) ===
-  observeEvent(
-    list(input$plot_click, input$rows, input$cols, input$showPaths, input$mode),
-    {
-      lastActivity(Sys.time())   # Reset activity
-      autoAnimate(FALSE)         # Stop auto animation immediately
-    }
-  )
-  
-  # === Observe exponent changes but ignore ones that are very close to our programmatic updates ===
-  observeEvent(input$exponent, {
-    lp <- lastProgrammatic()
-    if (!is.null(lp) && difftime(Sys.time(), lp, units = "secs") < progIgnoreWindow) {
-      # This change was likely caused by our code -> ignore for "user activity"
-      return()
-    }
-    # Otherwise treat as real user activity
-    lastActivity(Sys.time())
-    autoAnimate(FALSE)
+  observeEvent(input$toggleAnimate, {
+    autoAnimate(!autoAnimate())
   })
   
-  # === Check inactivity every 500ms and start autoAnimate when >= 5s of inactivity ===
-  observe({
-    invalidateLater(500, session)
-    isolate({
-      if (difftime(Sys.time(), lastActivity(), units = "secs") >= 5 && !autoAnimate()) {
-        autoAnimate(TRUE)
-        
-        # Immediately perform first increment and mark it programmatic so it won't count as activity
-        lastProgrammatic(Sys.time())
-        current <- isolate(input$exponent)
-        if (current < 25) {
-          updateSliderInput(session, "exponent", value = current + 1)
-        } else {
-          updateSliderInput(session, "exponent", value = 1)
-        }
-      }
-    })
-  })
-  
-  # === Increment exponent every 1.5 seconds while animating ===
   observe({
     req(autoAnimate())
-    invalidateLater(1500, session)  # 1.5 second between increments
+    invalidateLater(1500, session)
     
     isolate({
-      # Before programmatic update, set timestamp so the activity observer ignores it
       lastProgrammatic(Sys.time())
       current <- input$exponent
       if (current < 25) {
@@ -332,7 +291,6 @@ server <- function(input, output, session) {
     })
   })
   
-  # === Update knight position on click ===
   observeEvent(input$plot_click, {
     click <- input$plot_click
     x <- max(min(round(click$x), input$cols), 1)
@@ -342,7 +300,6 @@ server <- function(input, output, session) {
     text("")
   })
   
-  # === Keep position within bounds ===
   observeEvent(input$rows, {
     current_pos <- pos()
     if (current_pos[1] > input$rows) pos(c(input$rows, current_pos[2]))
@@ -353,7 +310,6 @@ server <- function(input, output, session) {
     if (current_pos[2] > input$cols) pos(c(current_pos[1], input$cols))
   })
   
-  # === Render plot and text ===
   output$textBox <- renderText({ text() })
   
   output$knightPlot <- renderPlot({
@@ -366,5 +322,4 @@ server <- function(input, output, session) {
   }, height = 650, width = 650)
 }
 
-# Run the application
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)

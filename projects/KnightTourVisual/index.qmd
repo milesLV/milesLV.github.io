@@ -11,17 +11,16 @@ categories:
 ```{r, "Imports", include=FALSE}
 library(tidyverse)
 library(Matrix)
-library(purrr)
-library(expm)
 library(grid)
 library(ggplot2)
-library(stringr)
 library(shiny)
-library(rsconnect)
 library(shinylive)
-library(httpuv)
-
+library(munsell)
 '%notin%' <- Negate('%in%')
+
+readRDS("/Users/miles5/Desktop/milesLV.github.io/docs/shinylive/webr/packages/metadata.rds")
+
+list.files("/Users/miles5/Desktop/milesLV.github.io/docs/shinylive/webr/packages", recursive = TRUE)
 ```
 
 ```{r, "Custom Helper Functions", include=FALSE}
@@ -104,18 +103,46 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
     if (ifValid(newPosition)) {
       return(newPosition)
     } else {
-      return(NULL)
+      return(invisible())
     }
   })
-  
-  return(compact(movesList))
+  movesList[sapply(movesList, is.null)] <- NULL
+  return(movesList)
 }
 
 makeKnightMoves(c(8,7), c(8,7))
+
+matrix_power <- function(A, n) {
+  # Check input
+  if (!is.matrix(A) || ncol(A) != nrow(A)) {
+    stop("A must be a square matrix")
+  }
+  if (!is.numeric(n) || length(n) != 1 || floor(n) != n) {
+    stop("Exponent n must be a single integer")
+  }
+  
+  # Handle special cases
+  if (n == 0) return(diag(nrow(A)))
+  if (n < 0) {
+    A <- solve(A)   # Invert for negative powers
+    n <- -n
+  }
+  
+  # Exponentiation by squaring
+  result <- diag(nrow(A))   # identity
+  base <- A
+  while (n > 0) {
+    if (n %% 2 == 1) {
+      result <- result %*% base
+    }
+    base <- base %*% base
+    n <- n %/% 2
+  }
+  result
+}
 ```
 
 ```{r, "Making Lattice Adjacency Matrix", include=FALSE}
-#1\space\space\space\space 2\space\space\space\space3\space\space\space\space4\\
 makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
   cellTotal <- numRow * numCol
   A <- matrix(0, nrow = cellTotal, ncol = cellTotal)
@@ -131,7 +158,7 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
         moveRow <- move[1]
         moveCol <- move[2]
         
-        if (moveRow <= numRow && moveCol <= numCol) { # if it's in the board
+        if(moveRow <= numRow && moveCol <= numCol) { # if it's in the board
           to_index <- index_from_coords(moveRow, moveCol)
           A[from_index, to_index] <- 1
           A[to_index, from_index] <- 1  # undirected
@@ -147,7 +174,6 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
 
 ```{r, "Actual Plot", include=FALSE}
 plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, exponent = 1, showPathsToExponent = FALSE, probability = FALSE) {
-
   if (length(position) != 2 || 
       !all(position >= 1) || 
       position[1] > nrows || 
@@ -160,12 +186,12 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
   if(showPathsToExponent && exponent != 1) {
     ATotal <- A
     for (i in 2:exponent) {
-      ATotal <- ATotal + A %^% i
+      ATotal <- ATotal + matrix_power(A, i)
       
     }
     A <- ATotal
   } else {
-    A <- A %^% exponent # exponentiating
+    A <- matrix_power(A, exponent) # exponentiating
   }
 
   # Convert origin to matrix index
@@ -184,12 +210,12 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
              paths = paths / totalPaths)
   }
   grid <- grid %>%
-    mutate(numDigits = ifelse(str_detect(paths, "^0\\."), 
-                              nchar(paths) - 3,
-                              nchar(paths)),
-      pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
-                              format(signif(paths, 3), scientific = TRUE), 
-                              paths))
+    mutate(numDigits = ifelse(grepl("^0\\.", paths),
+                             nchar(paths) - 3,
+                             nchar(paths)),
+           pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
+                                  format(signif(paths, 3), scientific = TRUE), 
+                                  paths))
              
   # Label the origin
   grid$Type <- ifelse(grid$index == origin_index, "Origin", "Other")
@@ -221,7 +247,7 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
                                    4.5))
               ) +
     coord_fixed() +
-    labs(title = str_c("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
+    labs(title = paste0("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
     guides(fill = guide_colorbar(barwidth = 25, barheight = 3)) + 
     theme_minimal() +
     theme(legend.position = "bottom",
@@ -236,7 +262,6 @@ plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, expon
           legend.title = element_text(size = readable+2)
           )
 }
-# plotKnightFromMatrix(c(6,5), 8, 6, exponent = 1, showPathsToExponent = TRUE, probability = TRUE)
 ```
 
 Below you will find a Shiny App made for fun using concepts learned in *Linear Algebra* and *Computational Linear Algebra*, most notably graphs, adjacency matrices, matrix exponentiation. All of the concepts used to build the app are explained from an introductory level if you are interested in learning what is going on behind the scenes.
@@ -276,7 +301,8 @@ ui <- fluidPage(
       radioButtons("mode", # make probability of count
                    label = "Number Mode",
                    choices = list("Count" = FALSE, "Probability" = TRUE),
-                   selected = FALSE)
+                   selected = FALSE),
+      actionButton("toggleAnimate", "Toggle Auto Animate", class = "btn-primary")
     ),
     mainPanel(
       plotOutput("knightPlot", click = "plot_click", width = "100%")
@@ -288,55 +314,11 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   pos <- reactiveVal(c(5, 5))
   text <- reactiveVal("Click any square to move the knight")
-  
-  # === Reactive value to track last activity time ===
-  lastActivity <- reactiveVal(Sys.time())
-  
-  # === Track whether auto animation is active ===
   autoAnimate <- reactiveVal(FALSE)
+  lastProgrammatic <- reactiveVal(NULL)
   
-  # === Timestamp for programmatic changes to input$exponent ===
-  lastProgrammatic <- reactiveVal(NULL)  # store Sys.time() for programmatic updates
-  progIgnoreWindow <- 0.6                # seconds: window to treat exponent changes as programmatic
-  
-  # === Observe non-exponent inputs for activity (these are always user interactions) ===
-  observeEvent(
-    list(input$plot_click, input$rows, input$cols, input$showPaths, input$mode),
-    {
-      lastActivity(Sys.time())   # Reset activity
-      autoAnimate(FALSE)         # Stop auto animation immediately
-    }
-  )
-  
-  # === Observe exponent changes but ignore ones that are very close to our programmatic updates ===
-  observeEvent(input$exponent, {
-    lp <- lastProgrammatic()
-    if (!is.null(lp) && difftime(Sys.time(), lp, units = "secs") < progIgnoreWindow) {
-      # This change was likely caused by our code -> ignore for "user activity"
-      return()
-    }
-    # Otherwise treat as real user activity
-    lastActivity(Sys.time())
-    autoAnimate(FALSE)
-  })
-  
-  # === Check inactivity every 500ms and start autoAnimate when >= 5s of inactivity ===
-  observe({
-    invalidateLater(500, session)
-    isolate({
-      if (difftime(Sys.time(), lastActivity(), units = "secs") >= 5 && !autoAnimate()) {
-        autoAnimate(TRUE)
-        
-        # Immediately perform first increment and mark it programmatic so it won't count as activity
-        lastProgrammatic(Sys.time())
-        current <- isolate(input$exponent)
-        if (current < 25) {
-          updateSliderInput(session, "exponent", value = current + 1)
-        } else {
-          updateSliderInput(session, "exponent", value = 1)
-        }
-      }
-    })
+  observeEvent(input$toggleAnimate, {
+    autoAnimate(!autoAnimate())
   })
   
   # === Increment exponent every 1.5 seconds while animating ===
@@ -391,7 +373,7 @@ server <- function(input, output, session) {
 }
 
 # Run the application
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
 ```
 
 

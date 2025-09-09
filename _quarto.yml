@@ -14,8 +14,8 @@ website:
         text: Projects
       - href: CV.qmd
         text: Cirriculum Vitae
-      - href: projects/KnightTourVisual/app/app.R
-        text: App
+      - href: app/app.R
+        text: App test
         
     right:
       - icon: envelope
