@@ -14,8 +14,6 @@ website:
         text: Projects
       - href: CV.qmd
         text: Cirriculum Vitae
-      - href: appRun.html
-        text: App test
         
     right:
       - icon: envelope

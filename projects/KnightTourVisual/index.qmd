@@ -14,13 +14,8 @@ library(Matrix)
 library(grid)
 library(ggplot2)
 library(shiny)
-library(shinylive)
-library(munsell)
+
 '%notin%' <- Negate('%in%')
-
-readRDS("/Users/miles5/Desktop/milesLV.github.io/docs/shinylive/webr/packages/metadata.rds")
-
-list.files("/Users/miles5/Desktop/milesLV.github.io/docs/shinylive/webr/packages", recursive = TRUE)
 ```
 
 ```{r, "Custom Helper Functions", include=FALSE}
@@ -268,7 +263,7 @@ Below you will find a Shiny App made for fun using concepts learned in *Linear A
 
 ## Shiny App
 
-```{r, "Shiny App"}
+```{r, "Shiny App", include=FALSE}
 ui <- fluidPage(
   sidebarLayout( # all of the input bars
     sidebarPanel(
@@ -376,6 +371,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
+<iframe src="https://mileslv.github.io/KnightsTourShinyApp/" width="100%" height="700"></iframe>
 
 ## The Math Behind the App
 
