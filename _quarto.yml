@@ -14,7 +14,7 @@ website:
         text: Projects
       - href: CV.qmd
         text: Cirriculum Vitae
-      - href: app/app.R
+      - href: appRun.html
         text: App test
         
     right:
