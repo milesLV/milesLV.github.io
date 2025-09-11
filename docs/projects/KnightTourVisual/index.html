@@ -130,7 +130,7 @@ window.Quarto = {
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../CV.html"> 
+    <a class="nav-link" href="../../cv.html"> 
 <span class="menu-text">Cirriculum Vitae</span></a>
   </li>  
 </ul>
@@ -221,9 +221,14 @@ window.Quarto = {
 <section id="adjacency-matrices" class="level3">
 <h3 class="anchored" data-anchor-id="adjacency-matrices">Adjacency Matrices</h3>
 <p>An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/graphExample.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="226"></p>
+<div id="suppfig-custom" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-suppfig figure">
+<div aria-describedby="suppfig-custom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/graphExample.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="226">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-suppfig quarto-uncaptioned" id="suppfig-custom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Fig.&nbsp;1
+</figcaption>
 </figure>
 </div>
 <p>The matrix shows which vertices in a graph are adjacent to one another and which are not. It can be thought of as this: the rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and otherwise it is 0.</p>
@@ -241,13 +246,13 @@ A =
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/graphExample2.png" class="img-fluid figure-img" width="324"></p>
-<figcaption>There is not difference between this graph and the one before, it will have the same adjacency matrix</figcaption>
+<figcaption>Fig. 2: There is no difference between this graph and the one before, it will have the same adjacency matrix</figcaption>
 </figure>
 </div>
 </section>
 <section id="lattice-adjacency-matrices" class="level3">
 <h3 class="anchored" data-anchor-id="lattice-adjacency-matrices">Lattice Adjacency Matrices</h3>
-<p>We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a <a href="https://en.wikipedia.org/wiki/Lattice_graph">Lattice graph</a> is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e.&nbsp;the square (1,2) has an x dimension and a y dimension).</p>
+<p>We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a <a href="https://en.wikipedia.org/wiki/Lattice_graph">Lattice graph</a> is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e.&nbsp;the square (1, 2) has an x dimension and a y dimension).</p>
 <p><span class="math display">\[
 \begin{gather*}
 \begin{bmatrix}
@@ -295,7 +300,7 @@ A =
 </div>
 </div>
 </div>
-<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length <span class="math inline">\(n\)</span> that start and end anywhere. For example, by taking the matrix <span class="math inline">\(A\)</span> from before (representative of the <a href="#adjacency-matrices">first graph</a>), computing <span class="math inline">\(A^2\)</span>, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:</p>
+<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length <span class="math inline">\(n\)</span> that start and end anywhere. For example, by taking the matrix <span class="math inline">\(A\)</span> from before (representative of <a href="#suppfig-custom" class="quarto-xref">Graph&nbsp;1</a>.), computing <span class="math inline">\(A^2\)</span>, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:</p>
 <p><span class="math display">\[
 \begin{equation*}
 \begin{gathered}
@@ -334,7 +339,12 @@ A =
 \]</span></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="images/graphExample3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="images/graphExample3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="300"></a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/graphExample3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Fig. 3: All of the paths extending to node 2 with 2 edges, as representative of col.&nbsp;2 of A^2"><img src="images/graphExample3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="300" alt="Fig. 3: All of the paths extending to node 2 with 2 edges, as representative of col.&nbsp;2 of A^2"></a></p>
+</figure>
+</div>
+<figcaption>Fig. 3: All of the paths extending to node 2 with 2 edges, as representative of col.&nbsp;2 of <span class="math inline">\(A^2\)</span></figcaption>
 </figure>
 </div>
 <p>Here it can clearly be seen that, just as before, when we look at the column 2, we find all of the nodes that have a connection with node 2, but this time it is if they have a path of 2 walks (from raising <span class="math inline">\(A\)</span> to <span class="math inline">\(n = 2\)</span>). This allows for there to be more numbers than just 0 and 1 as it’s possible that nodes have 2 ways to get to node 2 in 2 moves, just like in the case of node 2.</p>
@@ -776,7 +786,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","closeEffect":"zoom","selector":".lightbox","loop":false,"openEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"descPosition":"bottom","closeEffect":"zoom","openEffect":"zoom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

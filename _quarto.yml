@@ -12,7 +12,7 @@ website:
         text: Home
       - href: projects.qmd
         text: Projects
-      - href: CV.qmd
+      - href: cv.qmd
         text: Cirriculum Vitae
         
     right:

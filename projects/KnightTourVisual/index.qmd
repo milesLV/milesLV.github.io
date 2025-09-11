@@ -6,6 +6,14 @@ image: knightTourIcon.png
 categories:
   - Self-Directed
   - R
+crossref:
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfig
+      reference-prefix: Fig.
+      space-before-numbering: true
+      latex-list-of-description: Supplementary Figure
 ---
 
 ```{r, "Imports", include=FALSE}
@@ -179,9 +187,11 @@ Below you will find a Shiny App made for fun using concepts learned in *Linear A
 
 ### Adjacency Matrices {#adjacency-matrices}
 
-An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:
+An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below: 
 
+::: {#suppfig-custom} 
 ![](images/graphExample.png){fig-align="center" width="226"}
+:::
 
 The matrix shows which vertices in a graph are adjacent to one another and which are not. It can be thought of as this: the rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and otherwise it is 0.
 
@@ -199,11 +209,11 @@ For example, in our graph, 2 and 4 are connected. If you look in the 2nd row (th
 
 However, chess squares have fixed positions. In this graph, 1 could be placed to the right of 4 and it would not matter, as seen below.
 
-![There is not difference between this graph and the one before, it will have the same adjacency matrix](images/graphExample2.png){fig-align="center" width="324"}
+![Fig. 2: There is no difference between this graph and the one before, it will have the same adjacency matrix](images/graphExample2.png){fig-align="center" width="324"}
 
 ### Lattice Adjacency Matrices
 
-We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a [Lattice graph](https://en.wikipedia.org/wiki/Lattice_graph) is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e. the square (1,2) has an x dimension and a y dimension).
+We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a [Lattice graph](https://en.wikipedia.org/wiki/Lattice_graph) is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e. the square (1, 2) has an x dimension and a y dimension).
 
 $$
 \begin{gather*}
@@ -252,7 +262,7 @@ The end result looks like this:
 image(makeLatticeAdjMatrix())
 ```
 
-Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length $n$ that start and end anywhere. For example, by taking the matrix $A$ from before (representative of the [first graph](#adjacency-matrices)), computing $A^2$, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:
+Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length $n$ that start and end anywhere. For example, by taking the matrix $A$ from before (representative of [Graph -@suppfig-custom].), computing $A^2$, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:
 
 $$
 \begin{equation*}
@@ -291,7 +301,7 @@ $$
 \end{equation*}
 $$
 
-![](images/graphExample3.png){.lightbox fig-align="center" width="300"}
+![Fig. 3: All of the paths extending to node 2 with 2 edges, as representative of col. 2 of $A^2$](images/graphExample3.png){.lightbox fig-align="center" width="300"}
 
 Here it can clearly be seen that, just as before, when we look at the column 2, we find all of the nodes that have a connection with node 2, but this time it is if they have a path of 2 walks (from raising $A$ to $n = 2$). This allows for there to be more numbers than just 0 and 1 as it's possible that nodes have 2 ways to get to node 2 in 2 moves, just like in the case of node 2.
 
