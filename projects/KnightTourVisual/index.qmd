@@ -2,7 +2,7 @@
 title: "Knight's Tour Adjacency Matrix Visual"
 author: "Miles Libbey V"
 format: html
-image: knightTourIcon.png
+image: icon.png
 categories:
   - Self-Directed
   - R
@@ -161,7 +161,7 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
         moveRow <- move[1]
         moveCol <- move[2]
         
-        if(moveRow <= numRow && moveCol <= numCol) { # if it's in the board
+        if(moveRow <= numRow && moveCol <= numCol) { # if it's in the board dimensions
           to_index <- index_from_coords(moveRow, moveCol)
           A[from_index, to_index] <- 1
           A[to_index, from_index] <- 1  # undirected
@@ -170,7 +170,6 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
     }
   }
   
-  # return(as(A, "sparseMatrix"))
   return(A)
 }
 ```

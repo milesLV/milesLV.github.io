@@ -20,18 +20,21 @@ website:
         href: mailto:mlibbeyv@gmail.com
       - icon: linkedin
         href: "https://linkedin.com/in/miles-libbey-v"
+        target: _blank
       - icon: github
         href: "https://github.com/milesLV"
+        target: _blank
 
 format:
   html:
     theme: lumen
     css: styles.css
     toc: true
+    link-external-newwindow: true
     page-layout: article
     page-footer:
       left: |
-        &copy; [name], 2025<br>
+        &copy; Miles Libbey V, 2025<br>
         All content licensed under <i class='bi-badge-cc'></i>
         [(CC BY-NC-SA 4.0)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
       right: |

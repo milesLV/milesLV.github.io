@@ -1,7 +1,7 @@
 ---
 title: "Housing Status Changes in Substance Abuse Treatment"
 author: "Miles Libbey V"
-image: capstoneIcon.png
+image: icon.png
 categories: 
   - University
   - R
