@@ -62,7 +62,7 @@ modelUnhoused.fit(train_pool)
 
 \- Include thank you's to experts
 
-### Works Cited {style="text-align: center;"}
+### Works Cited
 
 Brubaker, Michael D., et al. “Barriers and Supports to Substance Abuse Service Use among Homeless Adults.” Journal of Addictions & Offender Counseling, vol. 34, no. 2, Oct. 2013, pp. 81–98, [https://doi.org/10.1002/j.2161-1874.2013.00017.x.](https://doi.org/10.1002/j.2161-1874.2013.00017.x) Accessed 24 October. 2024.
 

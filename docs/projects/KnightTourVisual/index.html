@@ -8,7 +8,7 @@
 
 <meta name="author" content="Miles Libbey V">
 
-<title>Knight’s Tour Adjacency Matrix Visual – milesLV.github.io</title>
+<title>Knight’s Tour Adjacency Matrix Visual – Miles Libbey V</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -112,7 +112,7 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">milesLV.github.io</span>
+    <span class="navbar-title">Miles Libbey V</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -172,7 +172,9 @@ window.Quarto = {
   <li><a href="#adjacency-matrices" id="toc-adjacency-matrices" class="nav-link" data-scroll-target="#adjacency-matrices">Adjacency Matrices</a></li>
   <li><a href="#lattice-adjacency-matrices" id="toc-lattice-adjacency-matrices" class="nav-link" data-scroll-target="#lattice-adjacency-matrices">Lattice Adjacency Matrices</a></li>
   <li><a href="#making-the-lattice-adjacency-matrix" id="toc-making-the-lattice-adjacency-matrix" class="nav-link" data-scroll-target="#making-the-lattice-adjacency-matrix">Making the Lattice Adjacency Matrix</a></li>
+  <li><a href="#what-it-all-means" id="toc-what-it-all-means" class="nav-link" data-scroll-target="#what-it-all-means">What It All Means</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -208,7 +210,7 @@ window.Quarto = {
 </header>
 
 
-<p>Below you will find a Shiny App made for fun using concepts learned in <em>Linear Algebra</em> and <em>Computational Linear Algebra</em>, most notably graphs, adjacency matrices, matrix exponentiation. All of the concepts used to build the app are explained from an introductory level if you are interested in learning what is going on behind the scenes.</p>
+<p>Below you will find a Shiny App made for fun using concepts learned in <em>Linear Algebra</em> and <em>Computational Linear Algebra</em>, most notably graphs, adjacency matrices, matrix exponentiation, and Markov chains. All of the key concepts used to build the app are explained if you are interested in learning what is going on behind the scenes.</p>
 <section id="shiny-app" class="level2">
 <h2 class="anchored" data-anchor-id="shiny-app">Shiny App</h2>
 <iframe src="https://mileslv.github.io/KnightsTourShinyApp/" width="100%" height="700">
@@ -221,10 +223,10 @@ window.Quarto = {
 <p>An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="images/graphExample-01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="images/graphExample-01.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="226"></a></p>
+<p><img src="images/graphExample.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="226"></p>
 </figure>
 </div>
-<p>The matrix shows which vertices are adjacent to one another and which are not. It can be thought of as this: rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and a 0 is placed if not.</p>
+<p>The matrix shows which vertices in a graph are adjacent to one another and which are not. It can be thought of as this: the rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and otherwise it is 0.</p>
 <p><span class="math display">\[
 A =
 \begin{bmatrix}
@@ -234,22 +236,18 @@ A =
 1 &amp; 1 &amp; 1 &amp; 0 \\
 \end{bmatrix}
 \]</span></p>
-<p>For example, in our graph, 2 and 4 are connected, so if you look in the 2nd row (the starting place) and then look at the 4th row (the ending place), you will see that there is a 1. Vice versa, if you look at <span class="math inline">\(A_{2,3}\)</span> you will see that it is a 0, meaning 2 and 3 are unconnected, which can be confirmed from looking at the graph. These types of matrices are always square <span class="math inline">\(n \times n\)</span> matrices because it just the same vertices being shown in the both and rows and columns. How this relates to a knight is if you imagine the 64 squares on a chess board as vertices, we can graph the connecting vertices to show what the knight can make in one move (later on we will be able to show multiple moves, but we are not there yet).</p>
-<p>However, chess squares have defined places where they are. In this graph, 1 can be put to the right of 4 and it wouldn’t matter, as seen below.</p>
+<p>For example, in our graph, 2 and 4 are connected. If you look in the 2nd row (the starting place) and then at the 4th column (the ending place), you will see that there is a 1. Conversely, if you look at <span class="math inline">\(A_{2,3}\)</span>, you will see that it is 0, meaning 2 and 3 are unconnected, which can be confirmed by looking at the graph. These types of matrices are always square <span class="math inline">\(n \times n\)</span> matrices because the same vertices are shown in both the rows and the columns. How this relates to a knight is as follows: if you imagine the 64 squares on a chessboard as vertices, we can graph the connecting vertices to show what the knight can reach in one move (later on, we will extend this to multiple moves, but we are not there yet).</p>
+<p>However, chess squares have fixed positions. In this graph, 1 could be placed to the right of 4 and it would not matter, as seen below.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="images/graphExample2-01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="There is not difference between this graph and the one before, it will have the same adjacency matrix"><img src="images/graphExample2-01.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="324" alt="There is not difference between this graph and the one before, it will have the same adjacency matrix"></a></p>
-</figure>
-</div>
+<p><img src="images/graphExample2.png" class="img-fluid figure-img" width="324"></p>
 <figcaption>There is not difference between this graph and the one before, it will have the same adjacency matrix</figcaption>
 </figure>
 </div>
 </section>
 <section id="lattice-adjacency-matrices" class="level3">
 <h3 class="anchored" data-anchor-id="lattice-adjacency-matrices">Lattice Adjacency Matrices</h3>
-<p>We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a <a href="https://en.wikipedia.org/wiki/Lattice_graph">Lattice graph</a> is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each squares is distinct and has 2-dimensional coordinates (i.e.&nbsp;the point (1,2) has an x dimension and a y dimension).</p>
+<p>We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a <a href="https://en.wikipedia.org/wiki/Lattice_graph">Lattice graph</a> is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e.&nbsp;the square (1,2) has an x dimension and a y dimension).</p>
 <p><span class="math display">\[
 \begin{gather*}
 \begin{bmatrix}
@@ -260,24 +258,27 @@ A =
 \text{Lattice Matrix}
 \end{gather*}
 \]</span></p>
-<p>Just as we made a adjacency matrix out of a normal graph, we can make a lattice adjacency matrix out of a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix is representative of a lattice point (i.e.&nbsp;<span class="math inline">\(A_{1,1} \text{ is representative of the lattice point } (1,1)\)</span>).</p>
-<p>In order to make a lattice adjacency matrix given <span class="math inline">\(n \times n\)</span> lattices, we will essentially construct a <span class="math inline">\(n^2 \times n^2\)</span> matrix. This comes from exactly what we did with the adjacency matrices; every single node was put across horizontally and vertically in order to have every pairs of connections between the nodes. Just in this case, since our grid has <span class="math inline">\(n \times n = n^2\)</span> lattices, it will be much larger. Essentially what we’re doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer-product of 2 of long vectors.</p>
+<p>Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., <span class="math inline">\(A_{1,1} \text{ represents the lattice point } (1,1)\)</span>).</p>
+<p>In order to make a lattice adjacency matrix given <span class="math inline">\(n \times n\)</span> lattices, we will essentially construct an <span class="math inline">\(n^2 \times n^2\)</span> matrix. This comes directly from what we did with the adjacency matrices; every single node was placed both horizontally and vertically in order to show every pair of connections between the nodes. In this case, since our grid has <span class="math inline">\(n \times n = n^2\)</span> lattices, the matrix will be much larger. Essentially, what we are doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer product of two long vectors.</p>
 <p><span class="math display">\[
 \begin{gather*}
   \begin{bmatrix}
-  1 &amp; 2 &amp; 3 \\
-  4 &amp; 5 &amp; 6 \\
-  7 &amp; 8 &amp; 9 \\
+  \textcolor{red}{1} &amp; \textcolor{red}{2} &amp; \textcolor{red}{3} \\
+  \textcolor{blue}{4} &amp; \textcolor{blue}{5} &amp; \textcolor{blue}{6} \\
+  \textcolor{green}{7} &amp; \textcolor{green}{8} &amp; \textcolor{green}{9} \\
   \end{bmatrix}
   \longrightarrow
   \begin{bmatrix}
-  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\ \end{bmatrix}
+  \textcolor{red}{1} \\ \textcolor{red}{2} \\ \textcolor{red}{3} \\ \textcolor{blue}{4} \\ \textcolor{blue}{5} \\ \textcolor{blue}{6} \\ \textcolor{green}{7} \\ \textcolor{green}{8} \\ \textcolor{green}{9} \\ \end{bmatrix}
+  \longrightarrow
+\begin{bmatrix}  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\ \end{bmatrix}
+\begin{bmatrix} 1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 \end{bmatrix}
   \longrightarrow
   \begin{bmatrix}
   &amp;1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 \\
   1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\
   \end{bmatrix} \\
-  \space\space\text{Lattice}\space\space\space\space\space\space\space\text{Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{2D Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space
+  \space\space\text{Lattice}\space\space\space\space\space\space\space\text{Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{Outer Product}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{2D Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space
 \end{gather*}
 \]</span></p>
 </section>
@@ -294,7 +295,7 @@ A =
 </div>
 </div>
 </div>
-<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, which we can see clearly using the matrix <span class="math inline">\(A\)</span> from before and making <span class="math inline">\(A^2\)</span> and zooming in on the results of node 2:</p>
+<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length <span class="math inline">\(n\)</span> that start and end anywhere. For example, by taking the matrix <span class="math inline">\(A\)</span> from before (representative of the <a href="#adjacency-matrices">first graph</a>), computing <span class="math inline">\(A^2\)</span>, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:</p>
 <p><span class="math display">\[
 \begin{equation*}
 \begin{gathered}
@@ -323,17 +324,34 @@ A =
   \\[1em]
   \begin{array}{c c l}
     \textbf{Start} &amp; \textbf{Count} &amp; \textbf{Explanation} \\
-    1 &amp; 1 &amp; \text{1 path from node 1 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (1 → 4 → 2) \\
-    2 &amp; 2 &amp; \text{2 paths from node 2 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (2 → 1 → 2), (2 → 4 → 2) \\
-    3 &amp; 1 &amp; \text{1 path from node 3 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (3 → 4 → 2) \\
-    4 &amp; 1 &amp; \text{1 path from node 4 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (4 → 1 → 2) \\
+    1 &amp; 1 &amp; \text{1 path from node 1 of } \textcolor{red}{\text{length }\textbf{2}} \text{ to node 2} \\
+    2 &amp; 2 &amp; \text{2 paths from node 2 of } \textcolor{blue}{\text{length }\textbf{2}} \text{ to node 2}\\
+    3 &amp; 1 &amp; \text{1 path from node 3 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2}\\
+    4 &amp; 1 &amp; \text{1 path from node 4 of } \textcolor{purple}{\text{length }\textbf{2}} \text{ to node 2}\\
     \end{array}
 \end{gathered}
 \end{equation*}
 \]</span></p>
-
-
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/graphExample3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="images/graphExample3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="300"></a></p>
+</figure>
+</div>
+<p>Here it can clearly be seen that, just as before, when we look at the column 2, we find all of the nodes that have a connection with node 2, but this time it is if they have a path of 2 walks (from raising <span class="math inline">\(A\)</span> to <span class="math inline">\(n = 2\)</span>). This allows for there to be more numbers than just 0 and 1 as it’s possible that nodes have 2 ways to get to node 2 in 2 moves, just like in the case of node 2.</p>
+<p>And there is no limit on how high the exponent can go– meaning that if it weren’t for computation time or the bigger inhibitor of digit space, the shiny app can display thousands of moves into the future.</p>
 </section>
+<section id="what-it-all-means" class="level3">
+<h3 class="anchored" data-anchor-id="what-it-all-means">What It All Means</h3>
+<p>While this project may not be the most practical application, the patterns that emerge in the app highlight broadly useful concepts from linear algebra. If you interact with the app long enough, you will notice that certain squares — particularly the central squares — consistently have the highest count or probability of the knight landing on them. This behavior mirrors the idea of eigenvalues in a matrix, which predict long-term behavior: in this case, how the tiles’ ‘popularity’ evolves after multiple moves. Eigenvalues essentially tell us the dominant patterns of movement that emerge after many iterations, with higher eigenvalues corresponding to squares that are more likely to be landed on.</p>
+<p>In some setups, there is a switch between light squares dominating or dark squares dominating depending on whether the exponent is odd or even. This is a result of the bipartite nature of the board: the board can be divided into two distinct sets of squares (light and dark), and squares within each set are not connected to others of the same set. This property is crucial because it suggests that the eigenvalues of the matrix governing the knight’s movement are symmetric around zero. Specifically, for matrices with this symmetry, we have <span class="math inline">\(\lambda \times m = -\lambda \times m\)</span>, which explains why odd and even powers of the matrix lead to such different behaviors. The switch between the odd and even powers of the matrix helps to explain the shifting dominance of the squares. When we raise the matrix to odd powers, the behavior tends to favor one set (either light or dark squares), while raising it to even powers leads to a more balanced or alternating pattern, as the symmetry of the eigenvalues becomes more apparent.</p>
+<p>Adjacency matrices can be very powerful tools, helping with topics such as the <a href="https://arxiv.org/abs/2207.02737">spread of infectious disease</a>, <a href="https://math.libretexts.org/Bookshelves/Linear_Algebra/Understanding_Linear_Algebra_(Austin)/04%3A_Eigenvalues_and_eigenvectors/4.05%3A_Markov_chains_and_Google's_PageRank_algorithm">Google’s PageRank</a>, and <a href="https://www.researchgate.net/publication/350840280_Applications_of_Markov_Chain_in_Forecast">weather forecast</a>.</p>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p>Brualdi, Richard. “The Mutually Beneficial Relationship of Graphs and Matrices.” CBMS Regional Conference Series in Mathematics, vol.&nbsp;115, no. 1, 6 July 2011, pp.&nbsp;14–23, <a href="www.ams.org/bookstore/pspdf/cbms-115-prev.pdf">www.ams.org/bookstore/pspdf/cbms-115-prev.pdf</a>, <a href="https://doi.org/10.1090/cbms/115" class="uri">https://doi.org/10.1090/cbms/115</a>. Accessed 9 Sept.&nbsp;2025.</p>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -758,7 +776,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","closeEffect":"zoom","openEffect":"zoom","selector":".lightbox"});
+<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","closeEffect":"zoom","selector":".lightbox","loop":false,"openEffect":"zoom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {
