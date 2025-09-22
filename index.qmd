@@ -28,9 +28,11 @@ You can find my CV [here](cv.qmd)
 ## Education
 
 ::: {##intro-heading}
-Macalester College 2021 - 2025 \| St. Paul, MN
 
 B.A. in Data Science \| September 2021 - May 2025
+
+Macalester College 2021 - 2025 \| St. Paul, MN
+
 :::
 
 # Featured Projects

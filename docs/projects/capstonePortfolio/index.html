@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Miles Libbey V">
 
-<title>Housing Status Changes in Substance Abuse Treatment – Miles Libbey V</title>
+<title>Housing Status Changes in Substance Abuse Treatment (Senior Capstone) – Miles Libbey V</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,8 +22,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -65,18 +66,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
-<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
-<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-fd01ca0b3fa01ca31275d8e32652620d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -109,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -146,12 +145,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://linkedin.com/in/miles-libbey-v"> <i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://linkedin.com/in/miles-libbey-v" target="_blank"> <i class="bi bi-linkedin" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/milesLV"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/milesLV" target="_blank"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -171,11 +170,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#catboostclassifier" id="toc-catboostclassifier" class="nav-link active" data-scroll-target="#catboostclassifier">CatboostClassifier</a>
+  <li><a href="#project-overview" id="toc-project-overview" class="nav-link active" data-scroll-target="#project-overview">Project Overview</a></li>
+  <li><a href="#background-motivation" id="toc-background-motivation" class="nav-link" data-scroll-target="#background-motivation">Background &amp; Motivation</a></li>
+  <li><a href="#substance-abuse-facility-treatment-data" id="toc-substance-abuse-facility-treatment-data" class="nav-link" data-scroll-target="#substance-abuse-facility-treatment-data">Substance Abuse Facility Treatment Data</a></li>
+  <li><a href="#classification-dimension-reduction-tools-methodology" id="toc-classification-dimension-reduction-tools-methodology" class="nav-link" data-scroll-target="#classification-dimension-reduction-tools-methodology">Classification + Dimension Reduction Tools (Methodology)</a></li>
+  <li><a href="#visual-results-and-interpretations" id="toc-visual-results-and-interpretations" class="nav-link" data-scroll-target="#visual-results-and-interpretations">Visual Results and Interpretations</a>
   <ul class="collapse">
-  <li><a href="#shap-values" id="toc-shap-values" class="nav-link" data-scroll-target="#shap-values">Shap Values</a></li>
-  <li><a href="#works-cited" id="toc-works-cited" class="nav-link" data-scroll-target="#works-cited">Works Cited</a></li>
+  <li><a href="#catboost-models" id="toc-catboost-models" class="nav-link" data-scroll-target="#catboost-models">CatBoost Models</a></li>
+  <li><a href="#the-importance-of-state-and-drugs-multiple-correspondence-analysis" id="toc-the-importance-of-state-and-drugs-multiple-correspondence-analysis" class="nav-link" data-scroll-target="#the-importance-of-state-and-drugs-multiple-correspondence-analysis">The Importance of State and Drugs (Multiple Correspondence Analysis)</a></li>
   </ul></li>
+  <li><a href="#who-were-the-people-not-included" id="toc-who-were-the-people-not-included" class="nav-link" data-scroll-target="#who-were-the-people-not-included">Who Were the People Not Included?</a></li>
+  <li><a href="#how-can-states-use-this-analysis" id="toc-how-can-states-use-this-analysis" class="nav-link" data-scroll-target="#how-can-states-use-this-analysis">How Can States Use this Analysis?</a></li>
+  <li><a href="#there-is-much-more-that-can-be-done" id="toc-there-is-much-more-that-can-be-done" class="nav-link" data-scroll-target="#there-is-much-more-that-can-be-done">There is Much More that Can be Done</a></li>
+  <li><a href="#special-thanks" id="toc-special-thanks" class="nav-link" data-scroll-target="#special-thanks">Special Thanks</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -184,11 +192,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Housing Status Changes in Substance Abuse Treatment</h1>
+<h1 class="title">Housing Status Changes in Substance Abuse Treatment (Senior Capstone)</h1>
   <div class="quarto-categories">
     <div class="quarto-category">University</div>
     <div class="quarto-category">R</div>
     <div class="quarto-category">Python</div>
+    <div class="quarto-category">Tableau</div>
   </div>
   </div>
 
@@ -212,324 +221,566 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This project was a one of 3 subsets of a larger project done for the Senior Capstone class <em>Projects In Data Science</em> aimed at analyzing SAMHSA’s TEDS-D (Treatment Episodic Data Set-Discharges) 2021 file in seeing how vital quality of life influences– employment status, housing status, and frequency of substance use– changed throughout the time substance abuse facility clients’ stay. This was accomplished from use of 2 time interval variables measuring the same aspect. For example, EMPLOY and EMPLOY_D measured employment at admission and employment at departure respectively.</p>
-<p>Specifically, this project set out to answer the question, <strong>What are the key differences in the characteristics of people whose living arrangements do or do Not change after treatment?</strong> In order to provide evidence, it dove into what the composite differences were between those who remained unhoused and those who went from being unhoused to living independently (with a slight interest in looking at those who came in living independently and became unhoused, only 0.6% of clients). This was all done in R, with some use of Python for running models unavailable in R (CatBoost and retreiving the SHAP values of those).</p>
+<section id="project-overview" class="level1">
+<h1>Project Overview</h1>
+<p>This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: <em>What distinguishes people whose housing status changes from those whose does not?</em></p>
+<p>I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.</p>
+</section>
+<section id="background-motivation" class="level1">
+<h1>Background &amp; Motivation</h1>
+<p>This project was completed as part of the <em>Projects in Data Science</em> capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.</p>
+<p>Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1&gt; year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly 40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.</p>
+<figure style="text-align: center;" class="figure">
+<img src="icon.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="600" class="figure-img">
+<figcaption>
+Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status
+</figcaption>
+</figure>
+</section>
+<section id="substance-abuse-facility-treatment-data" class="level1">
+<h1>Substance Abuse Facility Treatment Data</h1>
 <ul>
-<li><p>Build story</p>
-<ul>
-<li>Give context of project</li>
-</ul></li>
-<li><p>Include models / key visuals</p>
-<ul>
-<li><p>CatBoost + SHAP</p>
-<ul>
-<li>Brief why CatBoost and what they both show</li>
-</ul></li>
-<li><p>MCA + biplots (maybe just exclude a couple of less meaningful variables for legibility)</p></li>
-</ul></li>
+<li><strong>Source:</strong> TEDS‑D 2021 (SAMHSA)</li>
+<li><strong>Scope:</strong> ~370,000 anonymized client records, 76 variables (broadly can be categorized as demographic, treatment related (what services the clients received), and non-treatment related (answers that might come up in an intake form or police database – diagnoses, prior treatment, age of first substance use, etc.))</li>
+<li><strong>Inclusion criteria:</strong> Age 12+, completed treatment episode, public facilities only, all states excluding Delaware, Idaho, and Oregon</li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="basicAdmissionPlot.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="basicAdmissionPlot.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="347"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="capstoneIcon.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="capstoneIcon.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="600"></a></p>
-</figure>
-</div>
-<section id="catboostclassifier" class="level2">
-<h2 class="anchored" data-anchor-id="catboostclassifier">CatboostClassifier</h2>
+</section>
+<section id="classification-dimension-reduction-tools-methodology" class="level1">
+<h1>Classification + Dimension Reduction Tools (Methodology)</h1>
+<p>To analyze, I used 2 complementary tools:</p>
+<ul>
+<li><p><strong>Classification (CatBoost)</strong> — Supervised learning to classify whether a person <em>changed</em> versus <em>remained</em> in housing status between admission and discharge.</p></li>
+<li><p><strong>Dimensional Reduction (MCA)</strong> — Dimensional reduction to summarize multivariate categorical structure and highlight which categorical levels pull observations toward changing or remaining.</p></li>
+</ul>
+<p>Because unhoused and housed individuals differ significantly, 2 separate models were trained for clearer insights.</p>
+</section>
+<section id="visual-results-and-interpretations" class="level1">
+<h1>Visual Results and Interpretations</h1>
+<section id="catboost-models" class="level2">
+<h2 class="anchored" data-anchor-id="catboost-models">CatBoost Models</h2>
 <p>CatBoost is a gradient boosting model (like LightGM and XGBoost) that has a special CatBoost target encoding that makes it shine above the others for this project. Its unique target encoding allows for more effective and efficient predictions with categorical data, which is the datatype of 97% of the columns.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> teds_Unhoused.drop(columns<span class="op">=</span>[<span class="st">"LIVARAG_delta"</span>]) </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.astype(<span class="bu">str</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> teds_Unhoused[<span class="st">"LIVARAG_delta"</span>] </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>train_pool <span class="op">=</span> Pool(X, label<span class="op">=</span>y, cat_features<span class="op">=</span>X.columns.tolist())</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>modelUnhoused <span class="op">=</span> CatBoostClassifier(iterations<span class="op">=</span><span class="dv">700</span>, </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                           depth<span class="op">=</span><span class="dv">8</span>, </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                           learning_rate<span class="op">=</span><span class="fl">0.2</span>, </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                           loss_function<span class="op">=</span><span class="st">'Logloss'</span>, </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                           eval_metric<span class="op">=</span><span class="st">'AUC'</span>, </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                           verbose<span class="op">=</span><span class="dv">70</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>modelUnhoused.fit(train_pool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="images/catBoostMeasures.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="images/catBoostMeasures.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="269"></a></p>
-</figure>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Unhoused Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Independent Living Model</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
 </div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="images/unhousedMatrix.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="images/unhousedMatrix.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="428"></a></p>
-</figure>
+<div class="callout-title-container flex-fill">
+CatBoost Unhoused Model Scaffolding
 </div>
-<section id="shap-values" class="level3">
-<h3 class="anchored" data-anchor-id="shap-values">Shap Values</h3>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="images/SHAPValues.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="SHAP values give a little insight into how variables actually sway the classifier’s decision. In this plot, every dot is representative of one case, or one client. The further right a dot is, the higher probability of the client changing from unhoused to house is and vice versa. Since every dot is a single person, those humps are all people, so it is easy to spot that there are many groups in the variables. What is important to see is that there is a trend for these variables to leaning towards the right, with many large humps and tails being there. However, these variables aren’t just univariate and some have good sized humps on the left like in the case of State and Length of Stay. The next model gives insight into which models are more likely to be doing this."><img src="images/SHAPValues.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="427" alt="SHAP values give a little insight into how variables actually sway the classifier’s decision. In this plot, every dot is representative of one case, or one client. The further right a dot is, the higher probability of the client changing from unhoused to house is and vice versa. Since every dot is a single person, those humps are all people, so it is easy to spot that there are many groups in the variables. What is important to see is that there is a trend for these variables to leaning towards the right, with many large humps and tails being there. However, these variables aren’t just univariate and some have good sized humps on the left like in the case of State and Length of Stay. The next model gives insight into which models are more likely to be doing this."></a></p>
-</figure>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<figcaption>SHAP values give a little insight into how variables actually sway the classifier’s decision. In this plot, every dot is representative of one case, or one client. The further right a dot is, the higher probability of the client changing from unhoused to house is and vice versa. Since every dot is a single person, those humps are all people, so it is easy to spot that there are many groups in the variables. What is important to see is that there is a trend for these variables to leaning towards the right, with many large humps and tails being there. However, these variables aren’t just univariate and some have good sized humps on the left like in the case of State and Length of Stay. The next model gives insight into which models are more likely to be doing this.</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="images/MCABiplot-01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="images/MCABiplot-01.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="636"></a></p>
-</figure>
-</div>
-<p>- Include thank you’s to experts</p>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<section id="code" class="level4">
+<h4 class="anchored" data-anchor-id="code">Code:</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>teds_Unhoused <span class="op">=</span> teds[teds[<span class="st">"LIVARAG"</span>] <span class="op">==</span> <span class="dv">1</span>] <span class="co"># just people who start as unhoused</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>teds_Unhoused <span class="op">=</span> teds_Unhoused.drop(columns <span class="op">=</span> <span class="st">"LIVARAG"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> teds_Unhoused.drop(columns<span class="op">=</span>[<span class="st">"LIVARAG_delta"</span>]) </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.astype(<span class="bu">str</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> teds_Unhoused[<span class="st">"LIVARAG_delta"</span>] </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>train_pool <span class="op">=</span> Pool(X, label<span class="op">=</span>y, cat_features<span class="op">=</span>X.columns.tolist())</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>modelUnhoused <span class="op">=</span> CatBoostClassifier(iterations<span class="op">=</span><span class="dv">700</span>, <span class="co"># after a lot of hyper-parameter tuning, </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                           depth<span class="op">=</span><span class="dv">8</span>,                  these were the best</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                           learning_rate<span class="op">=</span><span class="fl">0.2</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                           loss_function<span class="op">=</span><span class="st">'Logloss'</span>, </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                           eval_metric<span class="op">=</span><span class="st">'AUC'</span>, </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                           verbose<span class="op">=</span><span class="dv">70</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>modelUnhoused.fit(train_pool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="works-cited" class="level3">
-<h3 class="anchored" data-anchor-id="works-cited">Works Cited</h3>
-<p>Brubaker, Michael D., et al.&nbsp;“Barriers and Supports to Substance Abuse Service Use among Homeless Adults.” Journal of Addictions &amp; Offender Counseling, vol.&nbsp;34, no. 2, Oct.&nbsp;2013, pp.&nbsp;81–98, <a href="https://doi.org/10.1002/j.2161-1874.2013.00017.x">https://doi.org/10.1002/j.2161-1874.2013.00017.x.</a> Accessed 24 October. 2024.</p>
-<p>Nicholls, Melanie J., and Lianne A. Urada. “Homelessness and Polysubstance Use: A Qualitative Study on Recovery and Treatment Access Solutions around an Urban Library in Southern California, USA.” Health &amp; Social Care in the Community, vol.&nbsp;30, no. 1, 14 May 2021, <a href="https://doi.org/10.1111/hsc.13424" class="uri">https://doi.org/10.1111/hsc.13424</a>.</p>
-<p>Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data</p>
-<p>Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <a href="https://www.samhsa.gov/data/" class="uri">https://www.samhsa.gov/data/</a>.</p>
+<section id="metrics" class="level4">
+<h4 class="anchored" data-anchor-id="metrics">Metrics:</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/catBoostUnhousedMeasures.png" class="img-fluid figure-img"></p>
+<figcaption>Feature importance results show that state-level variation is the strongest predictor of remaining unhoused, followed by frequency of substance use, length of stay, and treatment type. These findings highlight the combined influence of structural factors and individual behaviors on housing outcomes.</figcaption>
+</figure>
+</div>
+</section>
+<section id="confusion-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="confusion-matrix">Confusion Matrix:</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/matrixUnhoused.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="420"></p>
+</figure>
+</div>
+</section>
+</div>
+</div>
+</div>
+<section id="results-click-image-for-feature-importance-insights" class="level4">
+<h4 class="anchored" data-anchor-id="results-click-image-for-feature-importance-insights">Results (Click image for feature importance insights)</h4>
+<div style="text-align: center;">
+<figure class="figure">
+<p><img src="images/featureImportanceUnhoused.png" alt="Image A" id="pair1" style="cursor:pointer;" width="600" class="figure-img"></p>
+<figcaption id="pair1-caption">
+</figcaption>
+</figure>
+</div>
+</section>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+CatBoost Independent Living Model Scaffolding
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<section id="code-1" class="level4">
+<h4 class="anchored" data-anchor-id="code-1">Code:</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>teds_Independent <span class="op">=</span> teds[teds[<span class="st">"LIVARAG"</span>] <span class="op">==</span> <span class="dv">3</span>] <span class="co"># just people who came in as living independently</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>teds_Independent <span class="op">=</span> teds_Independent.drop(columns <span class="op">=</span> <span class="st">"LIVARAG"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> teds_Independent.drop(columns<span class="op">=</span>[<span class="st">"LIVARAG_delta"</span>]) <span class="co"># predictors</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> X2.astype(<span class="bu">str</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> teds_Independent[<span class="st">"LIVARAG_delta"</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>RUS <span class="op">=</span> RandomUnderSampler(sampling_strategy<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">8675309</span>) </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>X2, y2 <span class="op">=</span> RUS.fit_resample(X2, y2) <span class="co"># generating a few cases for minority class</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>train_pool2 <span class="op">=</span> Pool(X2, label<span class="op">=</span>y2, cat_features<span class="op">=</span>X2.columns.tolist())</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>modelIndependent <span class="op">=</span> CatBoostClassifier(iterations<span class="op">=</span><span class="dv">600</span>, </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                            depth<span class="op">=</span><span class="dv">6</span>, </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                            learning_rate<span class="op">=</span><span class="fl">0.2</span>, </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                            loss_function<span class="op">=</span><span class="st">'Logloss'</span>, </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                            eval_metric<span class="op">=</span><span class="st">'AUC'</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                            verbose<span class="op">=</span><span class="dv">60</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>modelIndependent.fit(train_pool2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="metrics-1" class="level4">
+<h4 class="anchored" data-anchor-id="metrics-1">Metrics:</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/catBoostIndependent.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="confusion-matrix-1" class="level4">
+<h4 class="anchored" data-anchor-id="confusion-matrix-1">Confusion Matrix:</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/matrixIndependent.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="420"></p>
+</figure>
+</div>
+</section>
+</div>
+</div>
+</div>
+<section id="results-click-image-for-feature-importance-insights-1" class="level4">
+<h4 class="anchored" data-anchor-id="results-click-image-for-feature-importance-insights-1">Results (Click image for feature importance insights)</h4>
+<div style="text-align: center;">
+<figure class="figure">
+<p><img src="images/featureImportanceIndependent.png" id="pair2" style="cursor:pointer;" width="600" class="figure-img"></p>
+<figcaption id="pair2-caption">
+</figcaption>
+</figure>
+</div>
+</section>
+</div>
+</div>
+</div>
+<div class="columns">
+<div class="column">
+<figure class="figure">
+<p><img src="images/meanPredictedProbClusters.png" id="pair3" style="cursor:pointer;" width="400" class="figure-img"></p>
+<figcaption>
+{Click image to see breakdown by housing at admission}<br> The predicted probabilities from both Averaged CatBoost predictions by state: Southeast and South-Central states show low transition rates into housing but high retention once independent. The Midwest shows the reverse. Montana and West Virginia are notable outliers.
+</figcaption>
+</figure>
+</div><div class="column">
+<ul>
+<li><span style="text-decoration: underline;"><strong>Change is predictable</strong></span> – CatBoost models strongly predict housing change, linking client and treatment attributes to short-term outcomes.<br>
+</li>
+<li><strong>State matters most</strong> – State of treatment dominates importance rankings, likely reflecting policies, housing availability, funding, and reporting practices.<br>
+</li>
+<li><strong>Employment matters</strong> – Employment at admission and discharge is critical for housing outcomes.<br>
+</li>
+<li><strong>Substance use frequency</strong> – Frequency of use in the week before discharge is highly predictive.<br>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="the-importance-of-state-and-drugs-multiple-correspondence-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="the-importance-of-state-and-drugs-multiple-correspondence-analysis">The Importance of State and Drugs (Multiple Correspondence Analysis)</h2>
+<p>Multiple Correspondence Analysis (MCA) is a statistical technique used to analyze and visualize relationships within categorical data. By reducing data with many features / dimensions into a lower-dimensional space, MCA helps identify patterns, associations, and underlying structures that might not be immediately obvious. It’s particularly useful for revealing granular relationships between the specific levels of categorical variables.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Unhoused Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Independent Model</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/biplotUnhousedIndependent.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="700"></p>
+</figure>
+</div>
+<p>Evidently, certain states and treatment duration strongly influence housing outcomes. What’s more, alcohol intoxication and substance-induced disorders are associated with remaining unhoused.</p>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/biplotIndependentUnhoused.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="700"></p>
+</figure>
+</div>
+<p>Drug type significantly influences likelihood of independent living at discharge. Individuals with cannabis or alcohol-related disorders tend to have more favorable outcomes than those with harder substances such as cocaine or barbiturates (Substance Abuse / Chemical Dependency, 2024).</p>
+</div>
+</div>
+</div>
+<p><strong>Consistent Trends Across Groups:</strong></p>
+<ul>
+<li><p><strong>State influence is dominant</strong> – Strong associations in both supporting and opposing stability.</p></li>
+<li><p><strong>Effective treatment</strong> – Longer stays, residential programs, and self-help participation improve outcomes.</p></li>
+<li><p><strong>Age minimal</strong> – Except ages 18–20, age has little effect.</p></li>
+<li><p><strong>Psychiatric disorders negligible</strong> – Only substance use disorders impact housing.</p></li>
+<li><p><strong>Certain substances harmful</strong> – Some drugs, especially among initially housed individuals, increase risk.</p></li>
+</ul>
+</section>
+</section>
+<section id="who-were-the-people-not-included" class="level1">
+<h1>Who Were the People Not Included?</h1>
+<ul>
+<li>The TEDS‑D only includes episodes that completed treatment — dropouts and transfers are excluded</li>
+<li>Not all public facilities are present, and private/non‑funded services are absent</li>
+<li>Certain states have different policies for who is recorded or not</li>
+</ul>
+</section>
+<section id="how-can-states-use-this-analysis" class="level1">
+<h1>How Can States Use this Analysis?</h1>
+<ol type="1">
+<li>Strengthen post‑treatment housing connections and state‑level funding pathways in states with lower change rates</li>
+<li>Invest in programs that extend effective treatment length and support self‑help or peer support engagement toward discharge</li>
+<li>Integrate employment services into discharge planning as a route toward stable housing</li>
+</ol>
+</section>
+<section id="there-is-much-more-that-can-be-done" class="level1">
+<h1>There is Much More that Can be Done</h1>
+<ul>
+<li>Link TEDS to longitudinal housing records (if possible) for long‑term outcomes</li>
+<li>Test moderation/interaction models: does state moderate the effect of treatment type or length of stay?</li>
+<li>Build a lightweight web tool for case managers: input client profile → predicted probability and top recommended interventions (e.g., residential, self‑help referral, employment services)</li>
+</ul>
+</section>
+<section id="special-thanks" class="level1">
+<h1>Special Thanks</h1>
+<p>Thank you to Hien-Anh (Avianna) Bui (Team Member), Ethan Caldecott (Team Member), Dr.&nbsp;Jaine Strauss (Expert; Psychology Professor), and Ellie Skelton (Expert; Touchstone Mental Health Executive Director) for their commitment, guidance, and domain expertise.</p>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p>Brubaker, M. D., Amatea, E. A., Torres-Rivera, E., Miller, M. D., &amp; Nabors, L. (2013). Barriers and Supports to Substance Abuse Service Use Among Homeless Adults. Journal of Addictions &amp; Offender Counseling, 34(2), 81–98. <a href="https://doi.org/10.1002/j.2161-1874.2013.00017.x" class="uri">https://doi.org/10.1002/j.2161-1874.2013.00017.x</a></p>
+<p>Lundberg, S. (2018). An introduction to explainable AI with Shapley values — SHAP latest documentation. Read the Docs. <a href="https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html" class="uri">https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html</a></p>
+<p>Nicholls, M. J., &amp; Urada, L. A. (2021). Homelessness and polysubstance use: A qualitative study on recovery and treatment access solutions around an urban library in Southern California, USA. Health &amp; Social Care in the Community, 30(1). <a href="https://doi.org/10.1111/hsc.13424" class="uri">https://doi.org/10.1111/hsc.13424</a></p>
+<p>Substance Abuse / Chemical Dependency. (2024). John Hopkins Medicine. <a href="https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency" class="uri">https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency</a></p>
+<p>Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <a href="https://www.samhsa.gov/data/" class="uri">https://www.samhsa.gov/data/</a>.</p>
+<p>US Department of Housing and Urban Development. (2015). Definition of Chronic Homelessness. HUD Exchange. <a href="https://www.hudexchange.info/homelessness-assistance/coc-esg-virtual-binders/coc-esg-homeless-eligibility/definition-of-chronic-homelessness/" class="uri">https://www.hudexchange.info/homelessness-assistance/coc-esg-virtual-binders/coc-esg-homeless-eligibility/definition-of-chronic-homelessness/</a></p>
+<hr>
+<script>
+  const swaps = [
+    {
+      id: "pair1",
+      img1: "images/featureImportanceUnhoused.png",
+      caption1: "Feature importance plot: shows the relative weight of predictors used in the model for unhoused outcomes.",
+      img2: "images/SHAPUnhousedPlot.png",
+      caption1: "Feature importance results show that state-level variation is the strongest predictor of remaining unhoused, followed by frequency of substance use, length of stay, and treatment type. These findings highlight the combined influence of structural factors and individual behaviors on housing outcomes.",
+      caption2: "SHAP values highlight how each feature affects a model’s prediction, helping to explain its decision (Lundberg, 2018). For unhoused individuals at admission, factors like state of residence, substance use near discharge, and treatment duration are linked to a higher likelihood of securing housing. Participation in self-help groups, psychological diagnoses, and employment status at admission and discharge also contribute to housing stability. In contrast, treatment length, education, treatment type, and age are associated with a higher risk of remaining unhoused."
+    },
+    {
+      id: "pair2",
+      img1: "images/featureImportanceIndependent.png",
+      caption1: "Feature importance results show that state-level variation and treatment type are the strongest predictors of independent housing outcomes, followed by individual characteristics such as employment, length of stay, and substance use patterns. This emphasizes how both structural context and personal circumstances shape housing trajectories.",
+      img2: "images/SHAPIndependentPlot.png",
+      caption2: "SHAP values highlight how each feature affects a model’s prediction, helping to explain its decision (Lundberg, 2018). Substance use at discharge and psychiatric diagnoses are strongly linked to the likelihood of becoming unhoused. Employment status, prior arrests, length of stay, and marital status also show notable but weaker associations. Conversely, factors like state of residence, treatment-related variables, and certain demographics are linked to greater housing stability, though with a smaller impact."
+    },
+    {
+      id: "pair3",
+      img1: "images/meanPredictedProbClusters.png",
+      caption1: "Mean predicted probabilities by cluster.",
+      img2: "images/meanPredictedProb.png",
+      caption2: "Mean predicted probabilities overall."
+    }
+  ];
+
+  swaps.forEach(swap => {
+    const img = document.getElementById(swap.id);
+    const caption = document.getElementById(swap.id + "-caption");
+
+    // initialize with img1 + caption1
+    if (img && caption) {
+      img.src = swap.img1;
+      caption.textContent = swap.caption1 || "";
+    }
+
+    img.addEventListener("click", () => {
+      if (img.src.includes(swap.img1)) {
+        img.src = swap.img2;
+        if (caption) caption.textContent = swap.caption2 || "";
+      } else {
+        img.src = swap.img1;
+        if (caption) caption.textContent = swap.caption1 || "";
+      }
+    });
+  });
+</script>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
         }
       }
+      return false;
     }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
-        return container.innerHTML
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -537,218 +788,162 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
-</div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","selector":".lightbox","loop":false,"openEffect":"zoom"});
-(function() {
-  let previousOnload = window.onload;
-  window.onload = () => {
-    if (previousOnload) {
-      previousOnload();
-    }
-    lightboxQuarto.on('slide_before_load', (data) => {
-      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-      const href = trigger.getAttribute('href');
-      if (href !== null) {
-        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
-        if (imgEl !== null) {
-          const srcAttr = imgEl.getAttribute("src");
-          if (srcAttr && srcAttr.startsWith("data:")) {
-            slideConfig.href = srcAttr;
-          }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
         }
-      } 
-    });
-  
-    lightboxQuarto.on('slide_after_load', (data) => {
-      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(slideNode);
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
       }
-    });
-  
-  };
-  
-})();
-          </script>
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
 
 
 

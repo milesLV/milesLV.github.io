@@ -1,47 +1,77 @@
 ---
-title: "Housing Status Changes in Substance Abuse Treatment"
+title: "Housing Status Changes in Substance Abuse Treatment (Senior Capstone)"
 author: "Miles Libbey V"
 image: icon.png
 categories: 
   - University
   - R
   - Python
-format: html
+  - Tableau
+format: 
+  html:
+    css: ../../styles.css
 ---
 
-This project was a one of 3 subsets of a larger project done for the Senior Capstone class *Projects In Data Science* aimed at analyzing SAMHSA's TEDS-D (Treatment Episodic Data Set-Discharges) 2021 file in seeing how vital quality of life influences– employment status, housing status, and frequency of substance use– changed throughout the time substance abuse facility clients' stay. This was accomplished from use of 2 time interval variables measuring the same aspect. For example, EMPLOY and EMPLOY_D measured employment at admission and employment at departure respectively.
+# Project Overview
 
-Specifically, this project set out to answer the question, **What are the key differences in the characteristics of people whose living arrangements do or do Not change after treatment?** In order to provide evidence, it dove into what the composite differences were between those who remained unhoused and those who went from being unhoused to living independently (with a slight interest in looking at those who came in living independently and became unhoused, only 0.6% of clients). This was all done in R, with some use of Python for running models unavailable in R (CatBoost and retreiving the SHAP values of those).
+This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: *What distinguishes people whose housing status changes from those whose does not?*  
 
--   Build story
+I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.
 
-    -   Give context of project
+# Background & Motivation
 
--   Include models / key visuals
+This project was completed as part of the *Projects in Data Science* capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.
 
-    -   CatBoost + SHAP
+Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1> year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly 40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.
 
-        -   Brief why CatBoost and what they both show
+<figure style="text-align: center;">
+  <img src="icon.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="600" />
+  <figcaption>Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status</figcaption>
+</figure>
 
-    -   MCA + biplots (maybe just exclude a couple of less meaningful variables for legibility)
+# Substance Abuse Facility Treatment Data
 
-![](basicAdmissionPlot.png){.lightbox fig-align="center" width="347"}
+-   **Source:** TEDS‑D 2021 (SAMHSA)
+-   **Scope:** \~370,000 anonymized client records, 76 variables (broadly can be categorized as demographic, treatment related (what services the clients received), and non-treatment related (answers that might come up in an intake form or police database -- diagnoses, prior treatment, age of first substance use, etc.))
+-   **Inclusion criteria:** Age 12+, completed treatment episode, public facilities only, all states excluding Delaware, Idaho, and Oregon
 
-![](capstoneIcon.png){.lightbox fig-align="center" width="600"}
+# Classification + Dimension Reduction Tools (Methodology)
 
-## CatboostClassifier
+To analyze, I used 2 complementary tools:
+
+-   **Classification (CatBoost)** — Supervised learning to classify whether a person *changed* versus *remained* in housing status between admission and discharge.
+
+-   **Dimensional Reduction (MCA)** — Dimensional reduction to summarize multivariate categorical structure and highlight which categorical levels pull observations toward changing or remaining.
+
+Because unhoused and housed individuals differ significantly, 2 separate models were trained for clearer insights.
+
+# Visual Results and Interpretations
+
+## CatBoost Models
 
 CatBoost is a gradient boosting model (like LightGM and XGBoost) that has a special CatBoost target encoding that makes it shine above the others for this project. Its unique target encoding allows for more effective and efficient predictions with categorical data, which is the datatype of 97% of the columns.
 
+::::: panel-tabset
+
+### Unhoused Model
+
+::: {.callout-note icon="false" collapse="true"}
+#### CatBoost Unhoused Model Scaffolding
+
+#### Code:
+
 ``` python
+teds_Unhoused = teds[teds["LIVARAG"] == 1] # just people who start as unhoused
+teds_Unhoused = teds_Unhoused.drop(columns = "LIVARAG")
+
 X = teds_Unhoused.drop(columns=["LIVARAG_delta"]) 
 X = X.astype(str)
 y = teds_Unhoused["LIVARAG_delta"] 
 
 train_pool = Pool(X, label=y, cat_features=X.columns.tolist())
 
-modelUnhoused = CatBoostClassifier(iterations=700, 
-                           depth=8, 
+modelUnhoused = CatBoostClassifier(iterations=700, # after a lot of hyper-parameter tuning, 
+                           depth=8,                  these were the best
                            learning_rate=0.2, 
                            loss_function='Logloss', 
                            eval_metric='AUC', 
@@ -50,24 +80,214 @@ modelUnhoused = CatBoostClassifier(iterations=700,
 modelUnhoused.fit(train_pool)
 ```
 
-![](images/catBoostMeasures.png){.lightbox fig-align="center" width="269"}
+#### Metrics:
 
-![](images/unhousedMatrix.png){.lightbox fig-align="center" width="428"}
+![Feature importance results show that state-level variation is the strongest predictor of remaining unhoused, followed by frequency of substance use, length of stay, and treatment type. These findings highlight the combined influence of structural factors and individual behaviors on housing outcomes.](images/catBoostUnhousedMeasures.png){fig-align="center"}
 
-### Shap Values
+#### Confusion Matrix:
 
-![SHAP values give a little insight into how variables actually sway the classifier's decision. In this plot, every dot is representative of one case, or one client. The further right a dot is, the higher probability of the client changing from unhoused to house is and vice versa. Since every dot is a single person, those humps are all people, so it is easy to spot that there are many groups in the variables. What is important to see is that there is a trend for these variables to leaning towards the right, with many large humps and tails being there. However, these variables aren't just univariate and some have good sized humps on the left like in the case of State and Length of Stay. The next model gives insight into which models are more likely to be doing this.](images/SHAPValues.png){.lightbox fig-align="center" width="427"}
+![](images/matrixUnhoused.png){fig-align="center" width="420"}
+:::
 
-![](images/MCABiplot-01.png){.lightbox fig-align="center" width="636"}
+#### Results (Click image for feature importance insights)
 
-\- Include thank you's to experts
+::: {style="text-align: center;"}
+<figure>
 
-### Works Cited
+  <img src="images/featureImportanceUnhoused.png" alt="Image A" id="pair1" style="cursor:pointer;" width="600"/>
 
-Brubaker, Michael D., et al. “Barriers and Supports to Substance Abuse Service Use among Homeless Adults.” Journal of Addictions & Offender Counseling, vol. 34, no. 2, Oct. 2013, pp. 81–98, [https://doi.org/10.1002/j.2161-1874.2013.00017.x.](https://doi.org/10.1002/j.2161-1874.2013.00017.x) Accessed 24 October. 2024.
+  <figcaption id="pair1-caption"> </figcaption>
 
-Nicholls, Melanie J., and Lianne A. Urada. “Homelessness and Polysubstance Use: A Qualitative Study on Recovery and Treatment Access Solutions around an Urban Library in Southern California, USA.” Health & Social Care in the Community, vol. 30, no. 1, 14 May 2021, <https://doi.org/10.1111/hsc.13424>.
+</figure>
+:::
 
-Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data
+### Independent Living Model
 
-Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <https://www.samhsa.gov/data/>.
+::: {.callout-note icon="false" collapse="true"}
+## CatBoost Independent Living Model Scaffolding
+
+#### Code:
+
+``` python
+teds_Independent = teds[teds["LIVARAG"] == 3] # just people who came in as living independently
+teds_Independent = teds_Independent.drop(columns = "LIVARAG")
+
+X2 = teds_Independent.drop(columns=["LIVARAG_delta"]) # predictors
+X2 = X2.astype(str)
+y2 = teds_Independent["LIVARAG_delta"]
+
+RUS = RandomUnderSampler(sampling_strategy=0.1, random_state=8675309) 
+X2, y2 = RUS.fit_resample(X2, y2) # generating a few cases for minority class
+
+train_pool2 = Pool(X2, label=y2, cat_features=X2.columns.tolist())
+
+modelIndependent = CatBoostClassifier(iterations=600, 
+                            depth=6, 
+                            learning_rate=0.2, 
+                            loss_function='Logloss', 
+                            eval_metric='AUC',
+                            verbose=60)
+
+modelIndependent.fit(train_pool2)
+```
+
+#### Metrics:
+
+![](images/catBoostIndependent.png){fig-align="center"}
+
+#### Confusion Matrix:
+
+![](images/matrixIndependent.png){fig-align="center" width="420"}
+
+:::
+
+#### Results (Click image for feature importance insights)
+
+::: {style="text-align: center;"}
+<figure>
+
+  <img src="images/featureImportanceIndependent.png" id="pair2" style="cursor:pointer;" width="600"/>
+
+  <figcaption id="pair2-caption"> </figcaption>
+
+</figure>
+:::
+
+:::::
+
+::::: columns
+::: column
+<figure>
+
+  <img src="images/meanPredictedProbClusters.png" id="pair3" style="cursor:pointer;" width="400"/>
+
+  <figcaption>{Click image to see breakdown by housing at admission}<br> The predicted probabilities from both Averaged CatBoost predictions by state: Southeast and South-Central states show low transition rates into housing but high retention once independent. The Midwest shows the reverse. Montana and West Virginia are notable outliers.</figcaption>
+
+</figure>
+:::
+
+::: column
+- [**Change is predictable**]{style="text-decoration: underline;"} – CatBoost models strongly predict housing change, linking client and treatment attributes to short-term outcomes.  
+- **State matters most** – State of treatment dominates importance rankings, likely reflecting policies, housing availability, funding, and reporting practices.  
+- **Employment matters** – Employment at admission and discharge is critical for housing outcomes.  
+- **Substance use frequency** – Frequency of use in the week before discharge is highly predictive.  
+:::
+:::::
+
+## The Importance of State and Drugs (Multiple Correspondence Analysis)
+
+Multiple Correspondence Analysis (MCA) is a statistical technique used to analyze and visualize relationships within categorical data. By reducing data with many features / dimensions into a lower-dimensional space, MCA helps identify patterns, associations, and underlying structures that might not be immediately obvious. It’s particularly useful for revealing granular relationships between the specific levels of categorical variables.
+
+::: panel-tabset
+### Unhoused Model
+
+![](images/biplotUnhousedIndependent.png){fig-align="center" width="700"}
+
+Evidently, certain states and treatment duration strongly influence housing outcomes. What's more, alcohol intoxication and substance-induced disorders are associated with remaining unhoused.
+
+### Independent Model
+
+![](images/biplotIndependentUnhoused.png){fig-align="center" width="700"}
+
+Drug type significantly influences likelihood of independent living at discharge. Individuals with cannabis or alcohol-related disorders tend to have more favorable outcomes than those with harder substances such as cocaine or barbiturates (Substance Abuse / Chemical Dependency, 2024).
+:::
+
+**Consistent Trends Across Groups:**  
+
+-   **State influence is dominant** – Strong associations in both supporting and opposing stability.
+
+-   **Effective treatment** – Longer stays, residential programs, and self-help participation improve outcomes.
+
+-   **Age minimal** – Except ages 18–20, age has little effect.
+
+-   **Psychiatric disorders negligible** – Only substance use disorders impact housing.
+
+-   **Certain substances harmful** – Some drugs, especially among initially housed individuals, increase risk.
+
+# Who Were the People Not Included?
+
+-   The TEDS‑D only includes episodes that completed treatment — dropouts and transfers are excluded
+-   Not all public facilities are present, and private/non‑funded services are absent
+-   Certain states have different policies for who is recorded or not
+
+# How Can States Use this Analysis?
+
+1.  Strengthen post‑treatment housing connections and state‑level funding pathways in states with lower change rates
+2.  Invest in programs that extend effective treatment length and support self‑help or peer support engagement toward discharge
+3.  Integrate employment services into discharge planning as a route toward stable housing
+
+# There is Much More that Can be Done
+
+-   Link TEDS to longitudinal housing records (if possible) for long‑term outcomes
+-   Test moderation/interaction models: does state moderate the effect of treatment type or length of stay?
+-   Build a lightweight web tool for case managers: input client profile → predicted probability and top recommended interventions (e.g., residential, self‑help referral, employment services)
+
+# Special Thanks
+
+Thank you to Hien-Anh (Avianna) Bui (Team Member), Ethan Caldecott (Team Member), Dr. Jaine Strauss (Expert; Psychology Professor), and Ellie Skelton (Expert; Touchstone Mental Health Executive Director) for their commitment, guidance, and domain expertise.
+
+# References
+
+Brubaker, M. D., Amatea, E. A., Torres-Rivera, E., Miller, M. D., & Nabors, L. (2013). Barriers and Supports to Substance Abuse Service Use Among Homeless Adults. Journal of Addictions & Offender Counseling, 34(2), 81–98. <https://doi.org/10.1002/j.2161-1874.2013.00017.x>
+
+Lundberg, S. (2018). An introduction to explainable AI with Shapley values — SHAP latest documentation. Read the Docs. <https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html>
+
+Nicholls, M. J., & Urada, L. A. (2021). Homelessness and polysubstance use: A qualitative study on recovery and treatment access solutions around an urban library in Southern California, USA. Health & Social Care in the Community, 30(1). <https://doi.org/10.1111/hsc.13424>
+
+Substance Abuse / Chemical Dependency. (2024). John Hopkins Medicine. <https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency>
+
+Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <https://www.samhsa.gov/data/>.
+
+US Department of Housing and Urban Development. (2015). Definition of Chronic Homelessness. HUD Exchange. <https://www.hudexchange.info/homelessness-assistance/coc-esg-virtual-binders/coc-esg-homeless-eligibility/definition-of-chronic-homelessness/>
+
+------------------------------------------------------------------------
+
+```{=html}
+<script>
+  const swaps = [
+    {
+      id: "pair1",
+      img1: "images/featureImportanceUnhoused.png",
+      caption1: "Feature importance plot: shows the relative weight of predictors used in the model for unhoused outcomes.",
+      img2: "images/SHAPUnhousedPlot.png",
+      caption1: "Feature importance results show that state-level variation is the strongest predictor of remaining unhoused, followed by frequency of substance use, length of stay, and treatment type. These findings highlight the combined influence of structural factors and individual behaviors on housing outcomes.",
+      caption2: "SHAP values highlight how each feature affects a model’s prediction, helping to explain its decision (Lundberg, 2018). For unhoused individuals at admission, factors like state of residence, substance use near discharge, and treatment duration are linked to a higher likelihood of securing housing. Participation in self-help groups, psychological diagnoses, and employment status at admission and discharge also contribute to housing stability. In contrast, treatment length, education, treatment type, and age are associated with a higher risk of remaining unhoused."
+    },
+    {
+      id: "pair2",
+      img1: "images/featureImportanceIndependent.png",
+      caption1: "Feature importance results show that state-level variation and treatment type are the strongest predictors of independent housing outcomes, followed by individual characteristics such as employment, length of stay, and substance use patterns. This emphasizes how both structural context and personal circumstances shape housing trajectories.",
+      img2: "images/SHAPIndependentPlot.png",
+      caption2: "SHAP values highlight how each feature affects a model’s prediction, helping to explain its decision (Lundberg, 2018). Substance use at discharge and psychiatric diagnoses are strongly linked to the likelihood of becoming unhoused. Employment status, prior arrests, length of stay, and marital status also show notable but weaker associations. Conversely, factors like state of residence, treatment-related variables, and certain demographics are linked to greater housing stability, though with a smaller impact."
+    },
+    {
+      id: "pair3",
+      img1: "images/meanPredictedProbClusters.png",
+      caption1: "Mean predicted probabilities by cluster.",
+      img2: "images/meanPredictedProb.png",
+      caption2: "Mean predicted probabilities overall."
+    }
+  ];
+
+  swaps.forEach(swap => {
+    const img = document.getElementById(swap.id);
+    const caption = document.getElementById(swap.id + "-caption");
+
+    // initialize with img1 + caption1
+    if (img && caption) {
+      img.src = swap.img1;
+      caption.textContent = swap.caption1 || "";
+    }
+
+    img.addEventListener("click", () => {
+      if (img.src.includes(swap.img1)) {
+        img.src = swap.img2;
+        if (caption) caption.textContent = swap.caption2 || "";
+      } else {
+        img.src = swap.img1;
+        if (caption) caption.textContent = swap.caption1 || "";
+      }
+    });
+  });
+</script>
+```

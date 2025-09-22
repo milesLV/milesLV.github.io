@@ -32,6 +32,11 @@ format:
     toc: true
     link-external-newwindow: true
     page-layout: article
+    grid:
+      body-width: 1000px     # make the main content wider
+      margin-width: 300px    # push the margin (where TOC sits) further right
+      sidebar-width: 550px     # optional: hide left sidebar if you have one
+      gutter-width: 1.5em
     page-footer:
       left: |
         &copy; Miles Libbey V, 2025<br>

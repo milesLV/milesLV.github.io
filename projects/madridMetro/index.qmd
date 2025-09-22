@@ -29,7 +29,7 @@ Designed and implemented a MySQL database for Madrid's metro system with detaile
 
 ### EER Diagram
 
-![](images/madridMetroIcon-01.png){.lightbox fig-align="center"}
+![](icon.png){.lightbox fig-align="center"}
 
 ------------------------------------------------------------------------
 

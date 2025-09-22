@@ -97,7 +97,7 @@ We combined **human annotation** and **LLM-assisted classification**:
 -   Interpreted outputs from **Hugging Face depression models** to connect loneliness with broader mental health themes
 
 |  |
-|:-----------------------------------------------------------------------|
+|:---|
 | \## Self-Directed Portion Although we had done a substantial portion, I went on |
 | \## Skills Showcased |
 | Skills demonstrated: · Natural Language Processing (NLP) · Annotation schema design & evaluation · Pseudo-labeling · Topic modeling (LDA) · Sentiment analysis & depression detection · Data storytelling & research synthesis |

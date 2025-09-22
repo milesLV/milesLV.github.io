@@ -1,3 +1,4 @@
+/* ------ LANDING PAGE DISPLAY IMAGES ----- */
 a.overlay-container {
   position: relative;
   display: inline-block;
@@ -36,12 +37,11 @@ a.overlay-container .overlay-text {
   z-index: 2;
 }
 
-/* Ensure both project cards take up half the width */
 .overlay-container {
   position: relative;
   display: block;
   width: 100%;
-  height: 255px; /* set a consistent height */
+  height: 255px;
   overflow: hidden;
   border-radius: 12px;
 }
@@ -59,4 +59,95 @@ a.overlay-container .overlay-text {
 /* On hover, zoom in slightly */
 .overlay-container:hover img {
   transform: scale(1.1);
+}
+
+
+/* ----- TABSETS ------ */
+.nav-tabs > li {
+  width: 50%;
+  text-align: center;
+}
+
+.nav-tabs .nav-link {
+  font-size: 1.1rem; /* Increase this value as needed */
+}
+
+/* ------- CALLOUT BLOCKS -------*/
+.callout-title-container.flex-fill {
+  font-size: 1.50em;
+}
+
+/* ------- TABLE OF CONTENTS ------*/
+/* ---------- Floating TOC wrapper ---------- */
+#floating-toc {
+  position: fixed;
+  top: 110px;                /* vertical position - tweak as needed */
+  right: 24px;               /* how far from the page edge */
+  width: 260px;              /* width of the floating box */
+  max-width: 28vw;
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+  background: var(--quarto-page-bg, #fff);
+  color: var(--quarto-text, #111);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.06);
+  z-index: 9999;
+  transition: transform .22s ease, opacity .18s ease;
+  font-size: 0.95rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* A tiny close-control row inside the floating area (script inserts a button) */
+#floating-toc .toc-close {
+  display: block;
+  text-align: right;
+  margin-bottom: 0.35rem;
+}
+
+/* Hidden state for the floating box */
+#floating-toc.hidden {
+  transform: translateX(10px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Floating toggle button (small pill) */
+#floating-toc-toggle {
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 10000;
+  background: var(--quarto-accent, #0b5fff);
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  font-size: 0.85rem;
+}
+
+/* Make sure the floating TOC and button don't show up when printing or on small screens */
+@media print {
+  #floating-toc, #floating-toc-toggle { display: none !important; }
+}
+@media (max-width: 900px) {
+  #floating-toc, #floating-toc-toggle { display: none !important; }
+}
+
+/* Optional: tighten TOC list spacing */
+#floating-toc .toc > ul,
+#floating-toc nav.toc > ul {
+  margin: 0.25rem 0;
+  padding-left: 0.75rem;
+}
+
+.references {
+  margin-left: 50px;  /* Adjust the left margin */
+  margin-right: 20px; /* Adjust the right margin */
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
