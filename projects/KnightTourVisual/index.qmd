@@ -6,19 +6,22 @@ image: icon.png
 categories:
   - Self-Directed
   - R
+crossref:
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfig
+      reference-prefix: Fig.
+      space-before-numbering: true
+      latex-list-of-description: Supplementary Figure
 ---
 
 ```{r, "Imports", include=FALSE}
-library(tidyverse)
+library(dplyr)
 library(Matrix)
-library(purrr)
-library(expm)
 library(grid)
 library(ggplot2)
-library(stringr)
 library(shiny)
-library(rsconnect)
-library(shinylive)
 
 '%notin%' <- Negate('%in%')
 ```
@@ -103,18 +106,46 @@ makeKnightMoves <- function(position, board_dims = c(8,8)) {
     if (ifValid(newPosition)) {
       return(newPosition)
     } else {
-      return(NULL)
+      return(invisible())
     }
   })
-  
-  return(compact(movesList))
+  movesList[sapply(movesList, is.null)] <- NULL
+  return(movesList)
 }
 
 makeKnightMoves(c(8,7), c(8,7))
+
+matrix_power <- function(A, n) {
+  # Check input
+  if (!is.matrix(A) || ncol(A) != nrow(A)) {
+    stop("A must be a square matrix")
+  }
+  if (!is.numeric(n) || length(n) != 1 || floor(n) != n) {
+    stop("Exponent n must be a single integer")
+  }
+  
+  # Handle special cases
+  if (n == 0) return(diag(nrow(A)))
+  if (n < 0) {
+    A <- solve(A)   # Invert for negative powers
+    n <- -n
+  }
+  
+  # Exponentiation by squaring
+  result <- diag(nrow(A))   # identity
+  base <- A
+  while (n > 0) {
+    if (n %% 2 == 1) {
+      result <- result %*% base
+    }
+    base <- base %*% base
+    n <- n %/% 2
+  }
+  result
+}
 ```
 
 ```{r, "Making Lattice Adjacency Matrix", include=FALSE}
-#1\space\space\space\space 2\space\space\space\space3\space\space\space\space4\\
 makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
   cellTotal <- numRow * numCol
   A <- matrix(0, nrow = cellTotal, ncol = cellTotal)
@@ -130,7 +161,7 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
         moveRow <- move[1]
         moveCol <- move[2]
         
-        if (moveRow <= numRow && moveCol <= numCol) { # if it's in the board
+        if(moveRow <= numRow && moveCol <= numCol) { # if it's in the board dimensions
           to_index <- index_from_coords(moveRow, moveCol)
           A[from_index, to_index] <- 1
           A[to_index, from_index] <- 1  # undirected
@@ -139,270 +170,29 @@ makeLatticeAdjMatrix <- function(numRow = 8, numCol = 8) {
     }
   }
   
-  # return(as(A, "sparseMatrix"))
   return(A)
 }
 ```
 
-```{r, "Actual Plot", include=FALSE}
-plotKnightFromMatrix <- function(position = c(1, 1), nrows = 8, ncols = 8, exponent = 1, showPathsToExponent = FALSE, probability = FALSE) {
-
-  if (length(position) != 2 || 
-      !all(position >= 1) || 
-      position[1] > nrows || 
-      position[2] > ncols) {
-    stop("Position must be within the board dimensions")
-  }
-  
-  A <- makeLatticeAdjMatrix(nrows, ncols)
-  
-  if(showPathsToExponent && exponent != 1) {
-    ATotal <- A
-    for (i in 2:exponent) {
-      ATotal <- ATotal + A %^% i
-      
-    }
-    A <- ATotal
-  } else {
-    A <- A %^% exponent # exponentiating
-  }
-
-  # Convert origin to matrix index
-  origin_index <- (position[1] - 1) * ncols + position[2]
-  path_counts <- A[origin_index, ]
-
-  # Map index → coordinates
-  grid <- expand.grid(x = 1:ncols, y = 1:nrows)
-  grid$index <- (grid$y - 1) * ncols + grid$x
-  grid$paths <- path_counts[grid$index]
-  
-  cutOff = 5
-  if (probability) {
-    grid <- grid %>%
-      mutate(totalPaths = sum(paths),
-             paths = paths / totalPaths)
-  }
-  grid <- grid %>%
-    mutate(numDigits = ifelse(str_detect(paths, "^0\\."), 
-                              nchar(paths) - 3,
-                              nchar(paths)),
-      pathsFormatted = ifelse(numDigits %notin% c(0:cutOff),
-                              format(signif(paths, 3), scientific = TRUE), 
-                              paths))
-             
-  # Label the origin
-  grid$Type <- ifelse(grid$index == origin_index, "Origin", "Other")
-  origin_tile <- grid %>% filter(Type == "Origin")
-  
-  knightImage <- png::readPNG("knightImage.png")
-  knightGrob <- rasterGrob(knightImage, interpolate = TRUE)
-
-  readable = 16
-  # Plot
-  ggplot(grid, aes(x = x, y = y, fill = paths)) +
-    geom_tile(color = "grey60") +
-    annotation_custom(
-      knightGrob,
-      xmin = origin_tile$x - 0.5,
-      xmax = origin_tile$x + 0.5,
-      ymin = origin_tile$y - 0.5,
-      ymax = origin_tile$y + 0.5
-    ) +
-    scale_fill_gradient(name = "# of Paths", low = "white", high = "firebrick", na.value = "white") +
-    scale_x_continuous(breaks = 1:ncols, minor_breaks = NULL) + 
-    scale_y_continuous(breaks = 1:nrows, minor_breaks = NULL) + 
-    geom_text(aes(label = ifelse(paths > 0, pathsFormatted, "")), 
-              color = "black", 
-              size = ifelse(grid$numDigits <= 3, 
-                            5, 
-                            ifelse(grid$numDigits > cutOff, 
-                                   4, 
-                                   4.5))
-              ) +
-    coord_fixed() +
-    labs(title = str_c("Possible Knight Moves after ", exponent," ", ifelse(exponent == 1, "Jump", "Consecutive Jumps"))) +
-    guides(fill = guide_colorbar(barwidth = 25, barheight = 3)) + 
-    theme_minimal() +
-    theme(legend.position = "bottom",
-          axis.title = element_blank(),
-          axis.ticks.length = unit(0, "pt"),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
-          axis.text.x = element_text(size = 16, margin = margin(t = -5)),
-          axis.text.y = element_text(size = 16, margin = margin(r = -5)),
-          plot.title = element_text(size = readable+5, margin = margin(b = -10)),
-          legend.text = element_text(size = readable-1),
-          legend.title = element_text(size = readable+2)
-          )
-}
-# plotKnightFromMatrix(c(6,5), 8, 6, exponent = 1, showPathsToExponent = TRUE, probability = TRUE)
-```
-
-Below you will find a Shiny App made for fun using concepts learned in *Linear Algebra* and *Computational Linear Algebra*, most notably graphs, adjacency matrices, matrix exponentiation. All of the concepts used to build the app are explained from an introductory level if you are interested in learning what is going on behind the scenes.
+Below you will find a Shiny App made for fun using concepts learned in *Linear Algebra* and *Computational Linear Algebra*, most notably graphs, adjacency matrices, matrix exponentiation, and Markov chains. All of the key concepts used to build the app are explained if you are interested in learning what is going on behind the scenes.
 
 ## Shiny App
 
-```{r, "Shiny App"}
-ui <- fluidPage(
-  sidebarLayout( # all of the input bars
-    sidebarPanel(
-      div(
-        style = "font-size: 24px; font-weight: bold; margin-top: 0px;",
-        textOutput("textBox")
-      ),
-      sliderInput("exponent", # id
-                  label = "Choose # of Consecutive Jumps",
-                  min = 1,
-                  max = 25,
-                  value = 1,
-                  step = 1),
-      sliderInput("rows",
-                  label = "# of Rows",
-                  min = 2,
-                  max = 8,
-                  value = 8,
-                  step = 1),
-      sliderInput("cols",
-                  label = "# of Columns",
-                  min = 2,
-                  max = 8,
-                  value = 8,
-                  step = 1),
-      radioButtons("showPaths",
-                   label = "Show Pathing Squares?",
-                   choices = list("Yes" = TRUE, "No" = FALSE),
-                   selected = TRUE),
-      radioButtons("mode", # make probability of count
-                   label = "Number Mode",
-                   choices = list("Count" = FALSE, "Probability" = TRUE),
-                   selected = FALSE)
-    ),
-    mainPanel(
-      plotOutput("knightPlot", click = "plot_click", width = "100%")
-    )
-  )
-)
-
-# Server logic to receive inputs
-server <- function(input, output, session) {
-  pos <- reactiveVal(c(5, 5))
-  text <- reactiveVal("Click any square to move the knight")
-  
-  # === Reactive value to track last activity time ===
-  lastActivity <- reactiveVal(Sys.time())
-  
-  # === Track whether auto animation is active ===
-  autoAnimate <- reactiveVal(FALSE)
-  
-  # === Timestamp for programmatic changes to input$exponent ===
-  lastProgrammatic <- reactiveVal(NULL)  # store Sys.time() for programmatic updates
-  progIgnoreWindow <- 0.6                # seconds: window to treat exponent changes as programmatic
-  
-  # === Observe non-exponent inputs for activity (these are always user interactions) ===
-  observeEvent(
-    list(input$plot_click, input$rows, input$cols, input$showPaths, input$mode),
-    {
-      lastActivity(Sys.time())   # Reset activity
-      autoAnimate(FALSE)         # Stop auto animation immediately
-    }
-  )
-  
-  # === Observe exponent changes but ignore ones that are very close to our programmatic updates ===
-  observeEvent(input$exponent, {
-    lp <- lastProgrammatic()
-    if (!is.null(lp) && difftime(Sys.time(), lp, units = "secs") < progIgnoreWindow) {
-      # This change was likely caused by our code -> ignore for "user activity"
-      return()
-    }
-    # Otherwise treat as real user activity
-    lastActivity(Sys.time())
-    autoAnimate(FALSE)
-  })
-  
-  # === Check inactivity every 500ms and start autoAnimate when >= 5s of inactivity ===
-  observe({
-    invalidateLater(500, session)
-    isolate({
-      if (difftime(Sys.time(), lastActivity(), units = "secs") >= 5 && !autoAnimate()) {
-        autoAnimate(TRUE)
-        
-        # Immediately perform first increment and mark it programmatic so it won't count as activity
-        lastProgrammatic(Sys.time())
-        current <- isolate(input$exponent)
-        if (current < 25) {
-          updateSliderInput(session, "exponent", value = current + 1)
-        } else {
-          updateSliderInput(session, "exponent", value = 1)
-        }
-      }
-    })
-  })
-  
-  # === Increment exponent every 1.5 seconds while animating ===
-  observe({
-    req(autoAnimate())
-    invalidateLater(1500, session)  # 1.5 second between increments
-    
-    isolate({
-      # Before programmatic update, set timestamp so the activity observer ignores it
-      lastProgrammatic(Sys.time())
-      current <- input$exponent
-      if (current < 25) {
-        updateSliderInput(session, "exponent", value = current + 1)
-      } else {
-        updateSliderInput(session, "exponent", value = 1)
-      }
-    })
-  })
-  
-  # === Update knight position on click ===
-  observeEvent(input$plot_click, {
-    click <- input$plot_click
-    x <- max(min(round(click$x), input$cols), 1)
-    y <- max(min(round(click$y), input$rows), 1)
-    
-    pos(c(y, x))
-    text("")
-  })
-  
-  # === Keep position within bounds ===
-  observeEvent(input$rows, {
-    current_pos <- pos()
-    if (current_pos[1] > input$rows) pos(c(input$rows, current_pos[2]))
-  })
-  
-  observeEvent(input$cols, {
-    current_pos <- pos()
-    if (current_pos[2] > input$cols) pos(c(current_pos[1], input$cols))
-  })
-  
-  # === Render plot and text ===
-  output$textBox <- renderText({ text() })
-  
-  output$knightPlot <- renderPlot({
-    plotKnightFromMatrix(position = pos(), 
-                         nrows = input$rows, 
-                         ncols = input$cols, 
-                         exponent = input$exponent, 
-                         showPathsToExponent = as.logical(input$showPaths),
-                         probability = as.logical(input$mode))
-  }, height = 650, width = 650)
-}
-
-# Run the application
-shinyApp(ui = ui, server = server)
-```
-
+<iframe 
+  src="https://mileslv.github.io/KnightsTourShinyApp/" width="100%" height="700">
+</iframe>
 
 ## The Math Behind the App
 
-### Adjacency Matrices
+### Adjacency Matrices {#adjacency-matrices}
 
-An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:
+An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below: 
 
-![](images/graphExample-01.png){.lightbox fig-align="center" width="226"}
+::: {#suppfig-custom} 
+![](images/graphExample.png){fig-align="center" width="226"}
+:::
 
-The matrix shows which vertices are adjacent to one another and which are not. It can be thought of as this: rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and a 0 is placed if not.
+The matrix shows which vertices in a graph are adjacent to one another and which are not. It can be thought of as this: the rows are the starting points and the columns are the ending points. If you can get from a starting point to an ending point, then a 1 is placed, and otherwise it is 0.
 
 $$
 A =
@@ -414,15 +204,15 @@ A =
 \end{bmatrix}
 $$
 
-For example, in our graph, 2 and 4 are connected, so if you look in the 2nd row (the starting place) and then look at the 4th row (the ending place), you will see that there is a 1. Vice versa, if you look at $A_{2,3}$ you will see that it is a 0, meaning 2 and 3 are unconnected, which can be confirmed from looking at the graph. These types of matrices are always square $n \times n$ matrices because it just the same vertices being shown in the both and rows and columns. How this relates to a knight is if you imagine the 64 squares on a chess board as vertices, we can graph the connecting vertices to show what the knight can make in one move (later on we will be able to show multiple moves, but we are not there yet).
+For example, in our graph, 2 and 4 are connected. If you look in the 2nd row (the starting place) and then at the 4th column (the ending place), you will see that there is a 1. Conversely, if you look at $A_{2,3}$, you will see that it is 0, meaning 2 and 3 are unconnected, which can be confirmed by looking at the graph. These types of matrices are always square $n \times n$ matrices because the same vertices are shown in both the rows and the columns. How this relates to a knight is as follows: if you imagine the 64 squares on a chessboard as vertices, we can graph the connecting vertices to show what the knight can reach in one move (later on, we will extend this to multiple moves, but we are not there yet).
 
-However, chess squares have defined places where they are. In this graph, 1 can be put to the right of 4 and it wouldn't matter, as seen below.
+However, chess squares have fixed positions. In this graph, 1 could be placed to the right of 4 and it would not matter, as seen below.
 
-![There is not difference between this graph and the one before, it will have the same adjacency matrix](images/graphExample2-01.png){.lightbox fig-align="center" width="324"}
+![Fig. 2: There is no difference between this graph and the one before, it will have the same adjacency matrix](images/graphExample2.png){fig-align="center" width="324"}
 
 ### Lattice Adjacency Matrices
 
-We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a [Lattice graph](https://en.wikipedia.org/wiki/Lattice_graph) is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each squares is distinct and has 2-dimensional coordinates (i.e. the point (1,2) has an x dimension and a y dimension).
+We need to introduce a system of order to the graph to make it more of a rigid grid. This is precisely why using a [Lattice graph](https://en.wikipedia.org/wiki/Lattice_graph) is so helpful in this case. Lattice graphs offer distinct coordinates, or lattices, which line up exactly with what we want to do with the chess squares because each square is distinct and has 2-dimensional coordinates (i.e. the square (1, 2) has an x dimension and a y dimension).
 
 $$
 \begin{gather*}
@@ -435,26 +225,29 @@ $$
 \end{gather*}
 $$
 
-Just as we made a adjacency matrix out of a normal graph, we can make a lattice adjacency matrix out of a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix is representative of a lattice point (i.e. $A_{1,1} \text{ is representative of the lattice point } (1,1)$).
+Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., $A_{1,1} \text{ represents the lattice point } (1,1)$).
 
-In order to make a lattice adjacency matrix given $n \times n$ lattices, we will essentially construct a $n^2 \times n^2$ matrix. This comes from exactly what we did with the adjacency matrices; every single node was put across horizontally and vertically in order to have every pairs of connections between the nodes. Just in this case, since our grid has $n \times n = n^2$ lattices, it will be much larger. Essentially what we're doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer-product of 2 of long vectors.
+In order to make a lattice adjacency matrix given $n \times n$ lattices, we will essentially construct an $n^2 \times n^2$ matrix. This comes directly from what we did with the adjacency matrices; every single node was placed both horizontally and vertically in order to show every pair of connections between the nodes. In this case, since our grid has $n \times n = n^2$ lattices, the matrix will be much larger. Essentially, what we are doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer product of two long vectors.
 
 $$
 \begin{gather*}
   \begin{bmatrix}
-  1 & 2 & 3 \\
-  4 & 5 & 6 \\
-  7 & 8 & 9 \\
+  \textcolor{red}{1} & \textcolor{red}{2} & \textcolor{red}{3} \\
+  \textcolor{blue}{4} & \textcolor{blue}{5} & \textcolor{blue}{6} \\
+  \textcolor{green}{7} & \textcolor{green}{8} & \textcolor{green}{9} \\
   \end{bmatrix}
   \longrightarrow 
   \begin{bmatrix}
-  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\ \end{bmatrix} 
+  \textcolor{red}{1} \\ \textcolor{red}{2} \\ \textcolor{red}{3} \\ \textcolor{blue}{4} \\ \textcolor{blue}{5} \\ \textcolor{blue}{6} \\ \textcolor{green}{7} \\ \textcolor{green}{8} \\ \textcolor{green}{9} \\ \end{bmatrix} 
+  \longrightarrow
+\begin{bmatrix}  1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\ \end{bmatrix} 
+\begin{bmatrix} 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \end{bmatrix}
   \longrightarrow
   \begin{bmatrix}
   &1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
   1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\ 9 \\
   \end{bmatrix} \\
-  \space\space\text{Lattice}\space\space\space\space\space\space\space\text{Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{2D Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space
+  \space\space\text{Lattice}\space\space\space\space\space\space\space\text{Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{Outer Product}\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\text{2D Long Vector}\space\space\space\space\space\space\space\space\space\space\space\space\space\space
 \end{gather*}
 $$
 
@@ -468,7 +261,7 @@ The end result looks like this:
 image(makeLatticeAdjMatrix())
 ```
 
-Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, which we can see clearly using the matrix $A$ from before and making $A^2$ and zooming in on the results of node 2:
+Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length $n$ that start and end anywhere. For example, by taking the matrix $A$ from before (representative of [Graph -@suppfig-custom].), computing $A^2$, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:
 
 $$
 \begin{equation*}
@@ -498,11 +291,29 @@ $$
   \\[1em]
   \begin{array}{c c l}
     \textbf{Start} & \textbf{Count} & \textbf{Explanation} \\
-    1 & 1 & \text{1 path from node 1 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (1 → 4 → 2) \\
-    2 & 2 & \text{2 paths from node 2 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (2 → 1 → 2), (2 → 4 → 2) \\
-    3 & 1 & \text{1 path from node 3 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (3 → 4 → 2) \\
-    4 & 1 & \text{1 path from node 4 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2: } (4 → 1 → 2) \\
+    1 & 1 & \text{1 path from node 1 of } \textcolor{red}{\text{length }\textbf{2}} \text{ to node 2} \\
+    2 & 2 & \text{2 paths from node 2 of } \textcolor{blue}{\text{length }\textbf{2}} \text{ to node 2}\\
+    3 & 1 & \text{1 path from node 3 of } \textcolor{green}{\text{length }\textbf{2}} \text{ to node 2}\\
+    4 & 1 & \text{1 path from node 4 of } \textcolor{purple}{\text{length }\textbf{2}} \text{ to node 2}\\
     \end{array}
 \end{gathered}
 \end{equation*}
 $$
+
+![Fig. 3: All of the paths extending to node 2 with 2 edges, as representative of col. 2 of $A^2$](images/graphExample3.png){.lightbox fig-align="center" width="300"}
+
+Here it can clearly be seen that, just as before, when we look at the column 2, we find all of the nodes that have a connection with node 2, but this time it is if they have a path of 2 walks (from raising $A$ to $n = 2$). This allows for there to be more numbers than just 0 and 1 as it's possible that nodes have 2 ways to get to node 2 in 2 moves, just like in the case of node 2.
+
+And there is no limit on how high the exponent can go-- meaning that if it weren't for computation time or the bigger inhibitor of digit space, the shiny app can display thousands of moves into the future.
+
+### What It All Means
+
+While this project may not be the most practical application, the patterns that emerge in the app highlight broadly useful concepts from linear algebra. If you interact with the app long enough, you will notice that certain squares — particularly the central squares — consistently have the highest count or probability of the knight landing on them. This behavior mirrors the idea of eigenvalues in a matrix, which predict long-term behavior: in this case, how the tiles' 'popularity' evolves after multiple moves. Eigenvalues essentially tell us the dominant patterns of movement that emerge after many iterations, with higher eigenvalues corresponding to squares that are more likely to be landed on.
+
+In some setups, there is a switch between light squares dominating or dark squares dominating depending on whether the exponent is odd or even. This is a result of the bipartite nature of the board: the board can be divided into two distinct sets of squares (light and dark), and squares within each set are not connected to others of the same set. This property is crucial because it suggests that the eigenvalues of the matrix governing the knight’s movement are symmetric around zero. Specifically, for matrices with this symmetry, we have $\lambda \times m = -\lambda \times m$, which explains why odd and even powers of the matrix lead to such different behaviors. The switch between the odd and even powers of the matrix helps to explain the shifting dominance of the squares. When we raise the matrix to odd powers, the behavior tends to favor one set (either light or dark squares), while raising it to even powers leads to a more balanced or alternating pattern, as the symmetry of the eigenvalues becomes more apparent.
+
+Adjacency matrices can be very powerful tools, helping with topics such as the [spread of infectious disease](https://arxiv.org/abs/2207.02737), [Google's PageRank](https://math.libretexts.org/Bookshelves/Linear_Algebra/Understanding_Linear_Algebra_(Austin)/04%3A_Eigenvalues_and_eigenvectors/4.05%3A_Markov_chains_and_Google's_PageRank_algorithm), and [weather forecast](https://www.researchgate.net/publication/350840280_Applications_of_Markov_Chain_in_Forecast).
+
+# References
+
+Brualdi, Richard. “The Mutually Beneficial Relationship of Graphs and Matrices.” CBMS Regional Conference Series in Mathematics, vol. 115, no. 1, 6 July 2011, pp. 14–23, [www.ams.org/bookstore/pspdf/cbms-115-prev.pdf](www.ams.org/bookstore/pspdf/cbms-115-prev.pdf), <https://doi.org/10.1090/cbms/115>. Accessed 9 Sept. 2025.

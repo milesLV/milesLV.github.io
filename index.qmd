@@ -6,7 +6,6 @@ project:
 
 format:
   html:
-    theme: cosmo
     css: styles.css
     toc: false
 ---
@@ -22,7 +21,13 @@ I believe, like the authors of *Freakonomics*, that the world is full of data an
 I have a long history of working with non-profits, beginning in high school where I completed my goal of getting 168 hours (a week's worth of time) in volunteer work to being a Development Intern at The Arc Minnesota just recently. Ultimately my goal is to hone my data skills so I can go back into the non-profit world and help to create real progress in any way I can.
 
 You can find my CV [here](cv.qmd)
+
+
 ::::
+
+<!-- <iframe  -->
+<!--   src="https://mileslv.github.io/Career-Timeline/" width="100%" height="600"> -->
+<!-- </iframe> -->
 
 
 ## Education
@@ -34,6 +39,8 @@ B.A. in Data Science \| September 2021 - May 2025
 Macalester College 2021 - 2025 \| St. Paul, MN
 
 :::
+
+
 
 # Featured Projects
 ::: {.grid}
