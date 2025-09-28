@@ -8,7 +8,7 @@
 
 <meta name="author" content="Miles Libbey V">
 
-<title>Housing Status Changes in Substance Abuse Treatment (Senior Capstone) – Miles Libbey V</title>
+<title>Housing Status Changes While in Substance Abuse Treatment (Senior Capstone) – Miles Libbey V</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -135,7 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../cv.html"> 
-<span class="menu-text">Cirriculum Vitae</span></a>
+<span class="menu-text">Resume</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -177,11 +177,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#visual-results-and-interpretations" id="toc-visual-results-and-interpretations" class="nav-link" data-scroll-target="#visual-results-and-interpretations">Visual Results and Interpretations</a>
   <ul class="collapse">
   <li><a href="#catboost-models" id="toc-catboost-models" class="nav-link" data-scroll-target="#catboost-models">CatBoost Models</a></li>
-  <li><a href="#the-importance-of-state-and-drugs-multiple-correspondence-analysis" id="toc-the-importance-of-state-and-drugs-multiple-correspondence-analysis" class="nav-link" data-scroll-target="#the-importance-of-state-and-drugs-multiple-correspondence-analysis">The Importance of State and Drugs (Multiple Correspondence Analysis)</a></li>
+  <li><a href="#the-importance-of-state-and-drugs-multiple-correspondence-analysis" id="toc-the-importance-of-state-and-drugs-multiple-correspondence-analysis" class="nav-link" data-scroll-target="#the-importance-of-state-and-drugs-multiple-correspondence-analysis">The Importance of State and Drugs (Multiple Correspondence Analysis)</a>
+  <ul class="collapse">
+  <li><a href="#consistent-trends-across-groups" id="toc-consistent-trends-across-groups" class="nav-link" data-scroll-target="#consistent-trends-across-groups">Consistent Trends Across Groups</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#who-were-the-people-not-included" id="toc-who-were-the-people-not-included" class="nav-link" data-scroll-target="#who-were-the-people-not-included">Who Were the People Not Included?</a></li>
   <li><a href="#how-can-states-use-this-analysis" id="toc-how-can-states-use-this-analysis" class="nav-link" data-scroll-target="#how-can-states-use-this-analysis">How Can States Use this Analysis?</a></li>
   <li><a href="#there-is-much-more-that-can-be-done" id="toc-there-is-much-more-that-can-be-done" class="nav-link" data-scroll-target="#there-is-much-more-that-can-be-done">There is Much More that Can be Done</a></li>
+  <li><a href="#skills" id="toc-skills" class="nav-link" data-scroll-target="#skills">Skills</a></li>
   <li><a href="#special-thanks" id="toc-special-thanks" class="nav-link" data-scroll-target="#special-thanks">Special Thanks</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -192,7 +196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Housing Status Changes in Substance Abuse Treatment (Senior Capstone)</h1>
+<h1 class="title">Housing Status Changes While in Substance Abuse Treatment (Senior Capstone)</h1>
   <div class="quarto-categories">
     <div class="quarto-category">University</div>
     <div class="quarto-category">R</div>
@@ -223,7 +227,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="project-overview" class="level1">
 <h1>Project Overview</h1>
-<p>This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: <em>What distinguishes people whose housing status changes from those whose does not?</em></p>
+<p>This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: <strong>What distinguishes people whose housing status changes from those whose does not?</strong></p>
 <p>I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.</p>
 </section>
 <section id="background-motivation" class="level1">
@@ -231,7 +235,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This project was completed as part of the <em>Projects in Data Science</em> capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.</p>
 <p>Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1&gt; year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly 40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.</p>
 <figure style="text-align: center;" class="figure">
-<img src="icon.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="600" class="figure-img">
+<img src="images/changeDiagram.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="750" class="figure-img">
 <figcaption>
 Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status
 </figcaption>
@@ -403,6 +407,8 @@ CatBoost Independent Living Model Scaffolding
 </figcaption>
 </figure>
 </div><div class="column">
+<section id="prediction-takeaways" class="level3">
+<h3 class="anchored" data-anchor-id="prediction-takeaways">Prediction Takeaways</h3>
 <ul>
 <li><span style="text-decoration: underline;"><strong>Change is predictable</strong></span> – CatBoost models strongly predict housing change, linking client and treatment attributes to short-term outcomes.<br>
 </li>
@@ -413,6 +419,7 @@ CatBoost Independent Living Model Scaffolding
 <li><strong>Substance use frequency</strong> – Frequency of use in the week before discharge is highly predictive.<br>
 </li>
 </ul>
+</section>
 </div>
 </div>
 </section>
@@ -440,7 +447,8 @@ CatBoost Independent Living Model Scaffolding
 </div>
 </div>
 </div>
-<p><strong>Consistent Trends Across Groups:</strong></p>
+<section id="consistent-trends-across-groups" class="level3">
+<h3 class="anchored" data-anchor-id="consistent-trends-across-groups">Consistent Trends Across Groups</h3>
 <ul>
 <li><p><strong>State influence is dominant</strong> – Strong associations in both supporting and opposing stability.</p></li>
 <li><p><strong>Effective treatment</strong> – Longer stays, residential programs, and self-help participation improve outcomes.</p></li>
@@ -448,6 +456,7 @@ CatBoost Independent Living Model Scaffolding
 <li><p><strong>Psychiatric disorders negligible</strong> – Only substance use disorders impact housing.</p></li>
 <li><p><strong>Certain substances harmful</strong> – Some drugs, especially among initially housed individuals, increase risk.</p></li>
 </ul>
+</section>
 </section>
 </section>
 <section id="who-were-the-people-not-included" class="level1">
@@ -473,6 +482,11 @@ CatBoost Independent Living Model Scaffolding
 <li>Test moderation/interaction models: does state moderate the effect of treatment type or length of stay?</li>
 <li>Build a lightweight web tool for case managers: input client profile → predicted probability and top recommended interventions (e.g., residential, self‑help referral, employment services)</li>
 </ul>
+</section>
+<section id="skills" class="level1">
+<h1>Skills</h1>
+<p>This project demonstrates my ability to: - Clean and structure large-scale categorical datasets for analysis - Build and interpret machine learning classification models (CatBoost) - Apply dimensionality reduction techniques (MCA) to uncover patterns - Translate statistical results into actionable insights in a social impact domain - Communicate technical findings effectively to both technical and non-technical audiences</p>
+<p>Skills Demonstrated: R · Python · Tableau · Data Wrangling · Machine Learning (CatBoost) · SHAP Interpretation · Dimensionality Reduction (MCA) · Data Visualization · Statistical Analysis · Research Communication</p>
 </section>
 <section id="special-thanks" class="level1">
 <h1>Special Thanks</h1>

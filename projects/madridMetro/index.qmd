@@ -9,7 +9,12 @@ categories:
 
 ## Project Overview
 
-Designed and implemented a MySQL database for Madrid's metro system with detailed schema and features based on a list of assumptions, including reactive triggers and events for calculating pricing, managing metro card validity, and handling client transactions dynamically based on age, city zone, and discount eligibility.
+The objective of the project was to design and implement a MySQL database that could, in theory, serve as the backbone of Madrid’s metro system—automatically handling ticket dispensing and decommissioning (upon expiration), calculating fare prices based on the client’s city zone and discount eligibility, and incorporating a detailed schema and features derived from a set of assumptions. 
+
+<figure style="text-align: center;">
+  <img src="icon.png" width="418" alt="Map of the Madrid metro lines">
+  <figcaption>Map of the Madrid metro lines</figcaption>
+</figure>
 
 ------------------------------------------------------------------------
 
@@ -25,11 +30,11 @@ Designed and implemented a MySQL database for Madrid's metro system with detaile
 
 ### Relational Schema
 
-![](images/madridMetroSchema.png){.lightbox fig-align="center"}
+![](images/schema.png){.lightbox fig-align="center"}
 
-### EER Diagram
+### Enhanced Entity-Relationship (EER) Diagram
 
-![](icon.png){.lightbox fig-align="center"}
+![](images/eerDiagram.png){.lightbox fig-align="center" }
 
 ------------------------------------------------------------------------
 
@@ -50,11 +55,11 @@ Designed and implemented a MySQL database for Madrid's metro system with detaile
 
 -   Dynamic pricing trigger calculates ticket cost based on:
 
-    [✦]{style="font-size:0.65em;"} Age (student/senior discounts)
+    [✦]{style="font-size:0.65em;"}   Age (student/senior discounts)
 
-    [✦]{style="font-size:0.65em;"} City zone
+    [✦]{style="font-size:0.65em;"}   City zone
 
-    [✦]{style="font-size:0.65em;"} Special discount status
+    [✦]{style="font-size:0.65em;"}   Special discount status
 
 ### Lifecycle Management
 

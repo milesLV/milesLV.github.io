@@ -1,7 +1,7 @@
 ---
-title: "Housing Status Changes in Substance Abuse Treatment (Senior Capstone)"
+title: "Housing Status Changes While in Substance Abuse Treatment (Senior Capstone)"
 author: "Miles Libbey V"
-image: icon.png
+image: icon2.png
 categories: 
   - University
   - R
@@ -14,7 +14,7 @@ format:
 
 # Project Overview
 
-This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: *What distinguishes people whose housing status changes from those whose does not?*  
+This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: **What distinguishes people whose housing status changes from those whose does not?**
 
 I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.
 
@@ -25,7 +25,7 @@ This project was completed as part of the *Projects in Data Science* capstone co
 Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1> year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly 40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.
 
 <figure style="text-align: center;">
-  <img src="icon.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="600" />
+  <img src="images/changeDiagram.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="750" />
   <figcaption>Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status</figcaption>
 </figure>
 
@@ -167,6 +167,8 @@ modelIndependent.fit(train_pool2)
 :::
 
 ::: column
+### Prediction Takeaways
+
 - [**Change is predictable**]{style="text-decoration: underline;"} – CatBoost models strongly predict housing change, linking client and treatment attributes to short-term outcomes.  
 - **State matters most** – State of treatment dominates importance rankings, likely reflecting policies, housing availability, funding, and reporting practices.  
 - **Employment matters** – Employment at admission and discharge is critical for housing outcomes.  
@@ -192,7 +194,7 @@ Evidently, certain states and treatment duration strongly influence housing outc
 Drug type significantly influences likelihood of independent living at discharge. Individuals with cannabis or alcohol-related disorders tend to have more favorable outcomes than those with harder substances such as cocaine or barbiturates (Substance Abuse / Chemical Dependency, 2024).
 :::
 
-**Consistent Trends Across Groups:**  
+### Consistent Trends Across Groups
 
 -   **State influence is dominant** – Strong associations in both supporting and opposing stability.
 
@@ -221,6 +223,12 @@ Drug type significantly influences likelihood of independent living at discharge
 -   Link TEDS to longitudinal housing records (if possible) for long‑term outcomes
 -   Test moderation/interaction models: does state moderate the effect of treatment type or length of stay?
 -   Build a lightweight web tool for case managers: input client profile → predicted probability and top recommended interventions (e.g., residential, self‑help referral, employment services)
+
+# Skills 
+
+This project demonstrates my ability to: - Clean and structure large-scale categorical datasets for analysis - Build and interpret machine learning classification models (CatBoost) - Apply dimensionality reduction techniques (MCA) to uncover patterns - Translate statistical results into actionable insights in a social impact domain - Communicate technical findings effectively to both technical and non-technical audiences
+
+Skills Demonstrated: R · Python ·  Tableau · Data Wrangling · Machine Learning (CatBoost) · SHAP Interpretation · Dimensionality Reduction (MCA) · Data Visualization · Statistical Analysis · Research Communication
 
 # Special Thanks
 

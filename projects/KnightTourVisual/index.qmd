@@ -314,6 +314,7 @@ In some setups, there is a switch between light squares dominating or dark squar
 
 Adjacency matrices can be very powerful tools, helping with topics such as the [spread of infectious disease](https://arxiv.org/abs/2207.02737), [Google's PageRank](https://math.libretexts.org/Bookshelves/Linear_Algebra/Understanding_Linear_Algebra_(Austin)/04%3A_Eigenvalues_and_eigenvectors/4.05%3A_Markov_chains_and_Google's_PageRank_algorithm), and [weather forecast](https://www.researchgate.net/publication/350840280_Applications_of_Markov_Chain_in_Forecast).
 
+
 # References
 
 Brualdi, Richard. “The Mutually Beneficial Relationship of Graphs and Matrices.” CBMS Regional Conference Series in Mathematics, vol. 115, no. 1, 6 July 2011, pp. 14–23, [www.ams.org/bookstore/pspdf/cbms-115-prev.pdf](www.ams.org/bookstore/pspdf/cbms-115-prev.pdf), <https://doi.org/10.1090/cbms/115>. Accessed 9 Sept. 2025.

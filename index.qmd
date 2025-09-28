@@ -14,29 +14,27 @@ format:
 ::: {style="float: left; margin-right: 15px;"}
 ![](profilePicture.png){width="300"}
 :::
-Hello! My name is Miles Libbey (he/him), a recent Macalester graduate with pursuits in Data Science, Psychology, Linguistics, and Political Science, passionate about focus on managing databases and transforming raw data into actionable insights. I enjoy working at the intersection of data engineering and analysis, ensuring that information is well-structured, reliable, and ready to reveal meaningful patterns. My most recent project was a outside-of-class Linguistics research with the department chair and a team of many students all from varying disciplines in order to produce a pending article about the dissimilarity of vocalic phonation distinctions across sex and gender. This research is currently being prepared for publication, and it exemplifies my enthusiasm for applying data analysis in new and exciting contexts.
+Hello! My name is Miles Libbey (he/him). I am a recent Macalester College graduate with pursuits in Data Science, Psychology, Linguistics, and Political Science. I am passionate about focus on managing databases and transforming raw data into actionable insights. I enjoy working at the intersection of data engineering and analysis, ensuring that information is well-structured, reliable, and ready to reveal meaningful patterns. My most recent project was outside-of-class Linguistics research focusing on the dissimilarity of vocalic phonation distinctions across sex and gender with the department chair and a multi-disciplinary team of many students. This research is currently being prepared for publication, and it exemplifies my enthusiasm for applying data analysis in new and exciting contexts.
 
 I believe, like the authors of *Freakonomics*, that the world is full of data and questions to be explored, and with the right tools and methods, nearly anything can be delved into. This curiosity is what led me to Data Science in the first place—its promise of helping to uncover hidden stories within data, whether through cleaning, analysis, or visualization.
 
 I have a long history of working with non-profits, beginning in high school where I completed my goal of getting 168 hours (a week's worth of time) in volunteer work to being a Development Intern at The Arc Minnesota just recently. Ultimately my goal is to hone my data skills so I can go back into the non-profit world and help to create real progress in any way I can.
 
-You can find my CV [here](cv.qmd)
+You can find my resume [here](cv.qmd)
 
 
 ::::
 
-<!-- <iframe  -->
-<!--   src="https://mileslv.github.io/Career-Timeline/" width="100%" height="600"> -->
-<!-- </iframe> -->
+<iframe
+  src="https://mileslv.github.io/Career-Timeline/" width="100%" height="450">
+</iframe>
 
 
 ## Education
 
 ::: {##intro-heading}
 
-B.A. in Data Science \| September 2021 - May 2025
-
-Macalester College 2021 - 2025 \| St. Paul, MN
+B.A. in Data Science \| Macalester College 2021 - 2025 \| St. Paul, MN
 
 :::
 
@@ -58,3 +56,107 @@ Macalester College 2021 - 2025 \| St. Paul, MN
 </a>
 :::
 :::
+
+<div class="button-wrapper">
+  <a href="projects.html" class="button-link">
+    Explore All of My Projects
+  </a>
+</div>
+
+
+
+<script>
+(function() {
+  function hasContent(el) {
+    if (!el) return false;
+    // consider an overlay "contentful" if it has an <img> or .overlay-text
+    return !!(el.querySelector && (el.querySelector('img') || el.querySelector('.overlay-text')));
+  }
+
+  // Map of href -> first "contentful" element (or first encountered if none contentful)
+  const keepMap = new Map();
+  const removed = [];
+
+  // First pass: register contentful overlays by href
+  document.querySelectorAll('.overlay-container').forEach(el => {
+    const href = (el.getAttribute && el.getAttribute('href')) || (el.querySelector && el.querySelector('a')?.getAttribute('href')) || '';
+    const key = href.toLowerCase();
+    const contentful = hasContent(el);
+
+    if (!keepMap.has(key)) {
+      // keep the first contentful if possible, otherwise keep this for now
+      keepMap.set(key, { el, contentful });
+    } else {
+      const existing = keepMap.get(key);
+      // if existing is not contentful but this one is, upgrade the keeper
+      if (!existing.contentful && contentful) {
+        // remove previously stored element (we'll remove DOM later)
+        if (existing.el && existing.el.remove) {
+          existing.el.remove();
+          removed.push(existing.el);
+        }
+        keepMap.set(key, { el, contentful });
+      } else {
+        // otherwise this is a duplicate; remove it if it's empty, or if both contentful, remove this later
+        if (!contentful) {
+          if (el.remove) { el.remove(); removed.push(el); }
+        } else {
+          // both contentful — keep the first, remove this one
+          if (el.remove) { el.remove(); removed.push(el); }
+        }
+      }
+    }
+  });
+
+  // If you want to be extra defensive against late DOM injection by Quarto/theme scripts,
+  // run a short MutationObserver to catch newly-added duplicates for a few seconds:
+  const observer = new MutationObserver(muts => {
+    muts.forEach(m => {
+      m.addedNodes.forEach(node => {
+        if (node.nodeType !== 1) return;
+        if (node.matches && node.matches('.overlay-container')) {
+          const href = (node.getAttribute && node.getAttribute('href')) || (node.querySelector && node.querySelector('a')?.getAttribute('href')) || '';
+          const key = href.toLowerCase();
+          const contentful = hasContent(node);
+          const existing = keepMap.get(key);
+          if (!existing) {
+            keepMap.set(key, { el: node, contentful });
+          } else {
+            if (!existing.contentful && contentful) {
+              if (existing.el && existing.el.remove) existing.el.remove();
+              keepMap.set(key, { el: node, contentful });
+            } else {
+              // remove the new duplicate
+              if (node.remove) { node.remove(); removed.push(node); }
+            }
+          }
+        } else if (node.querySelectorAll) {
+          node.querySelectorAll('.overlay-container').forEach(child => {
+            // same logic for nested added nodes
+            const href = (child.getAttribute && child.getAttribute('href')) || (child.querySelector && child.querySelector('a')?.getAttribute('href')) || '';
+            const key = href.toLowerCase();
+            const contentful = hasContent(child);
+            const existing = keepMap.get(key);
+            if (!existing) {
+              keepMap.set(key, { el: child, contentful });
+            } else {
+              if (!existing.contentful && contentful) {
+                if (existing.el && existing.el.remove) existing.el.remove();
+                keepMap.set(key, { el: child, contentful });
+              } else {
+                if (child.remove) { child.remove(); removed.push(child); }
+              }
+            }
+          });
+        }
+      });
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+  // stop observing after 5s (adjust if your theme injects later)
+  setTimeout(() => observer.disconnect(), 5000);
+
+  console.info('overlay dedupe: removed', removed.length, 'duplicate overlay(s). Kept', keepMap.size, 'unique overlay(s).');
+})();
+</script>

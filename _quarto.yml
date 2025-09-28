@@ -13,7 +13,7 @@ website:
       - href: projects.qmd
         text: Projects
       - href: cv.qmd
-        text: Cirriculum Vitae
+        text: Resume
         
     right:
       - icon: envelope

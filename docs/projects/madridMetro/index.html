@@ -138,7 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../cv.html"> 
-<span class="menu-text">Cirriculum Vitae</span></a>
+<span class="menu-text">Resume</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#system-architecture" id="toc-system-architecture" class="nav-link" data-scroll-target="#system-architecture">System Architecture</a>
   <ul class="collapse">
   <li><a href="#relational-schema" id="toc-relational-schema" class="nav-link" data-scroll-target="#relational-schema">Relational Schema</a></li>
-  <li><a href="#eer-diagram" id="toc-eer-diagram" class="nav-link" data-scroll-target="#eer-diagram">EER Diagram</a></li>
+  <li><a href="#enhanced-entity-relationship-eer-diagram" id="toc-enhanced-entity-relationship-eer-diagram" class="nav-link" data-scroll-target="#enhanced-entity-relationship-eer-diagram">Enhanced Entity-Relationship (EER) Diagram</a></li>
   </ul></li>
   <li><a href="#key-features" id="toc-key-features" class="nav-link" data-scroll-target="#key-features">Key Features</a>
   <ul class="collapse">
@@ -232,7 +232,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="project-overview" class="level2">
 <h2 class="anchored" data-anchor-id="project-overview">Project Overview</h2>
-<p>Designed and implemented a MySQL database for Madrid’s metro system with detailed schema and features based on a list of assumptions, including reactive triggers and events for calculating pricing, managing metro card validity, and handling client transactions dynamically based on age, city zone, and discount eligibility.</p>
+<p>The objective of the project was to design and implement a MySQL database that could, in theory, serve as the backbone of Madrid’s metro system—automatically handling ticket dispensing and decommissioning (upon expiration), calculating fare prices based on the client’s city zone and discount eligibility, and incorporating a detailed schema and features derived from a set of assumptions.</p>
+<figure style="text-align: center;" class="figure">
+<img src="icon.png" width="418" alt="Map of the Madrid metro lines" class="figure-img">
+<figcaption>
+Map of the Madrid metro lines
+</figcaption>
+</figure>
 <hr>
 </section>
 <section id="system-architecture" class="level2">
@@ -249,15 +255,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="relational-schema">Relational Schema</h3>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="images/madridMetroSchema.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="images/madridMetroSchema.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></a></p>
+<p><a href="images/schema.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="images/schema.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></a></p>
 </figure>
 </div>
 </section>
-<section id="eer-diagram" class="level3">
-<h3 class="anchored" data-anchor-id="eer-diagram">EER Diagram</h3>
+<section id="enhanced-entity-relationship-eer-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="enhanced-entity-relationship-eer-diagram">Enhanced Entity-Relationship (EER) Diagram</h3>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="icon.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="icon.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></a></p>
+<p><a href="images/eerDiagram.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="images/eerDiagram.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></a></p>
 </figure>
 </div>
 <hr>
