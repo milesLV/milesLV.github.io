@@ -12,11 +12,13 @@ format:
 
 :::: {#intro-heading}
 ::: {style="float: left; margin-right: 15px;"}
-![](profilePicture.png){width="300"}
+![](profilePicture.png){width="320"}
 :::
+
 Hello! My name is Miles Libbey (he/him). I am a recent Macalester College graduate with pursuits in Data Science, Psychology, Linguistics, and Political Science. I am passionate about focus on managing databases and transforming raw data into actionable insights. I enjoy working at the intersection of data engineering and analysis, ensuring that information is well-structured, reliable, and ready to reveal meaningful patterns. My most recent project was outside-of-class Linguistics research focusing on the dissimilarity of vocalic phonation distinctions across sex and gender with the department chair and a multi-disciplinary team of many students. This research is currently being prepared for publication, and it exemplifies my enthusiasm for applying data analysis in new and exciting contexts.
 
 I believe, like the authors of *Freakonomics*, that the world is full of data and questions to be explored, and with the right tools and methods, nearly anything can be delved into. This curiosity is what led me to Data Science in the first place—its promise of helping to uncover hidden stories within data, whether through cleaning, analysis, or visualization.
+
 
 I have a long history of working with non-profits, beginning in high school where I completed my goal of getting 168 hours (a week's worth of time) in volunteer work to being a Development Intern at The Arc Minnesota just recently. Ultimately my goal is to hone my data skills so I can go back into the non-profit world and help to create real progress in any way I can.
 
@@ -26,7 +28,7 @@ You can find my resume [here](cv.qmd)
 ::::
 
 <iframe
-  src="https://mileslv.github.io/Career-Timeline/" width="100%" height="450">
+  src="https://mileslv.github.io/Career-Timeline/" width = 100% height="450">
 </iframe>
 
 
@@ -44,7 +46,7 @@ B.A. in Data Science \| Macalester College 2021 - 2025 \| St. Paul, MN
 ::: {.grid}
 ::: {.g-col-6}
 <a href="projects/capstonePortfolio/index.html" class="overlay-container">
-  <img src="projects/capstonePortfolio/icon.png">
+  <img src="projects/capstonePortfolio/icon20.png">
   <div class="overlay-text">Most Recent Project</div>
 </a>
 :::

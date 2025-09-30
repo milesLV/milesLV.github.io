@@ -22,11 +22,15 @@ I compared individuals who remained unhoused with those who transitioned into in
 
 This project was completed as part of the *Projects in Data Science* capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.
 
-Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1> year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly 40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.
+Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1> year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly <a href="#change-diagram" style="text-decoration:none">*</a>40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.
 
-<figure style="text-align: center;">
-  <img src="images/changeDiagram.png" alt="Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status" width="750" />
-  <figcaption>Percentage of Where People Go from Admission (left) to Discharge (right) by Housing Status</figcaption>
+<figure id="change-diagram" style="text-align: center;">
+  <img src="images/changeDiagram.png" 
+       alt="How clients' housing changes from admission to a substance abuse treatment facility (top) to when they are discharged (bottom)." 
+       width="750" />
+  <figcaption>
+    How clients' housing changes from Admission (top) to Discharge (bottom)
+  </figcaption>
 </figure>
 
 # Substance Abuse Facility Treatment Data
@@ -228,7 +232,7 @@ Drug type significantly influences likelihood of independent living at discharge
 
 This project demonstrates my ability to: - Clean and structure large-scale categorical datasets for analysis - Build and interpret machine learning classification models (CatBoost) - Apply dimensionality reduction techniques (MCA) to uncover patterns - Translate statistical results into actionable insights in a social impact domain - Communicate technical findings effectively to both technical and non-technical audiences
 
-Skills Demonstrated: R · Python ·  Tableau · Data Wrangling · Machine Learning (CatBoost) · SHAP Interpretation · Dimensionality Reduction (MCA) · Data Visualization · Statistical Analysis · Research Communication
+> **Skills Demonstrated:** R **·** Python **·**  Tableau **·** Data Wrangling **·** Machine Learning (CatBoost) **·** SHAP Interpretation **·** Dimensionality Reduction (MCA) **·** Data Visualization **·** Statistical Analysis **·** Research Communication
 
 # Special Thanks
 

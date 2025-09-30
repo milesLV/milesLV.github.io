@@ -21,9 +21,7 @@ We combined computational methods, sentiment analysis, and topic modeling to ana
 
 ## Motivation
 
-Loneliness has become a growing concern among digital-native youth. While social media promises connectivity, it often fosters superficial interactions, comparison, and emotional withdrawal. Prior research shows clear links between social media and mental health challenges like anxiety and depression — but much less attention has been paid to whether loneliness itself is becoming *normalized* and how people are approaching it.
-
-We aimed to fill that gap.
+Loneliness has become a growing concern among digital-native youth. While social media promises connectivity, it often fosters superficial interactions, comparison, and emotional withdrawal. Prior research shows clear links between social media and mental health challenges like anxiety and depression — but much less attention has been paid to whether loneliness itself is becoming *normalized* and how people are approaching it. We aimed to fill that gap.
 
 ------------------------------------------------------------------------
 
@@ -79,7 +77,7 @@ We combined **human annotation** and **LLM-assisted classification**:
 
 ## Key Takeaways
 
--   **Normalization?** Our findings suggest loneliness is **not normalized in a neutral sense** — instead, it remains largely experienced as negative, isolating, and emotionally heavy
+-   **Normalization?** Our findings suggest loneliness is not normalized in a neutral sense — instead, it remains largely experienced as negative, isolating, and emotionally heavy
 -   **Methods Matter**: Annotating loneliness sentiment proved challenging, even for humans. LLMs can help scale annotation, but interpretation requires caution
 -   **Future Directions**:
     -   Explore fine-grained loneliness categories (duration, coping)
@@ -90,34 +88,33 @@ We combined **human annotation** and **LLM-assisted classification**:
 
 ## My Contributions
 
--   Designed the **sentiment annotation schema**.
--   Coordinated the **human annotation process** and evaluated inter-rater agreement
--   Implemented **LLM-assisted annotation pipeline** with Gemini
--   Conducted **topic modeling (LDA)** and analyzed cross-topic sentiment trends
--   Interpreted outputs from **Hugging Face depression models** to connect loneliness with broader mental health themes
+-   Designed the sentiment annotation schema
+-   Coordinated the human annotation process and evaluated inter-rater agreement
+-   Implemented LLM-assisted annotation pipeline with Google's Gemini API
+-   Conducted LDA topic modeling and analyzed cross-topic sentiment trends
+-   Interpreted outputs from Hugging Face depression models to connect loneliness with broader mental health themes
 
-|  |
-|:---|
-| \## Self-Directed Portion Although we had done a substantial portion, I went on |
-| \## Skills Showcased |
-| Skills demonstrated: · Natural Language Processing (NLP) · Annotation schema design & evaluation · Pseudo-labeling · Topic modeling (LDA) · Sentiment analysis & depression detection · Data storytelling & research synthesis |
+
+# Skills Showcased
+
+> Skills demonstrated: **·** Natural Language Processing (NLP) **·** Annotation schema design & evaluation **·** Pseudo-labeling **·** Topic modeling (LDA) **·** Sentiment analysis & depression detection **·** Data storytelling & research synthesis
 
 ## References
 
--   Çıtak (ensarcitak), Ensar. “Ensarcitak/Dilbazlar-Multilabel-Depression-Anxiety-Detection-Model-Acc-91 · Hugging Face.” Huggingface.co, 2019, [huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91](http://huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91). Accessed 10 May 2025.
+Çıtak (ensarcitak), Ensar. “Ensarcitak/Dilbazlar-Multilabel-Depression-Anxiety-Detection-Model-Acc-91 **·** Hugging Face.” Huggingface.co, 2019, [huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91](http://huggingface.co/ensarcitak/dilbazlar-multilabel-depression-anxiety-detection-model-acc-91). Accessed 10 May 2025.
 
--   Guntuku, S. C., Yaden, D. B., Kern, M. L., Ungar, L. H., & Eichstaedt, J. C. (2017). Detecting depression and mental illness on social media: an integrative review. Current Opinion in Behavioral Sciences, 18, 43-49.
+Guntuku, S. C., Yaden, D. B., Kern, M. L., Ungar, L. H., & Eichstaedt, J. C. (2017). Detecting depression and mental illness on social media: an integrative review. Current Opinion in Behavioral Sciences, 18, 43-49.
 
--   Jiang, Y., Jiang, Y., Leqi, L., & Winkielman, P. (2022). Many Ways to Be Lonely: Fine-Grained Characterization of Loneliness and Its Potential Changes in COVID-19. Proceedings of the International AAAI Conference on Web and Social Media, 16(1), 405-416. Retrieved from <https://ojs.aaai.org/index.php/ICWSM/article/view/19302>
+Jiang, Y., Jiang, Y., Leqi, L., & Winkielman, P. (2022). Many Ways to Be Lonely: Fine-Grained Characterization of Loneliness and Its Potential Changes in COVID-19. Proceedings of the International AAAI Conference on Web and Social Media, 16(1), 405-416. Retrieved from <https://ojs.aaai.org/index.php/ICWSM/article/view/19302>
 
--   Khalaf, A. M., Alubied, A. A., Khalaf, A. M., Rifaey, A. A., Alubied, A., & Rifaey, A. (2023). The impact of social media on the mental health of adolescents and young adults: a systematic review. Cureus, 15(8).
+Khalaf, A. M., Alubied, A. A., Khalaf, A. M., Rifaey, A. A., Alubied, A., & Rifaey, A. (2023). The impact of social media on the mental health of adolescents and young adults: a systematic review. Cureus, 15(8).
 
--   Koh, J. Y., McAleer, S., Fried, D., & Salakhutdinov, R. (2024). Tree search for language model agents. arXiv preprint arXiv:2407.01476.
+Koh, J. Y., McAleer, S., Fried, D., & Salakhutdinov, R. (2024). Tree search for language model agents. arXiv preprint arXiv:2407.01476.
 
--   Park, H. W., Park, S., & Chong, M. (2020). Conversations and medical news frames on Twitter: Infodemiological study on COVID-19 in South Korea. Journal of medical internet research, 22(5), e18897.
+Park, H. W., Park, S., & Chong, M. (2020). Conversations and medical news frames on Twitter: Infodemiological study on COVID-19 in South Korea. Journal of medical internet research, 22(5), e18897.
 
--   Poudel, A. (2024). Sentiment Classifier for Depression. Retrieved from <https://huggingface.co/poudel/sentiment-classifier>
+Poudel, A. (2024). Sentiment Classifier for Depression. Retrieved from <https://huggingface.co/poudel/sentiment-classifier>
 
--   Rafał Poświata and Michał Perełkiewicz. 2022. OPI\@LT-EDI-ACL2022: Detecting Signs of Depression from Social Media Text using RoBERTa Pre-trained Language Models. In Proceedings of the Second Workshop on Language Technology for Equality, Diversity and Inclusion, pages 276–282, Dublin, Ireland. Association for Computational Linguistics.
+Rafał Poświata and Michał Perełkiewicz. 2022. OPI\@LT-EDI-ACL2022: Detecting Signs of Depression from Social Media Text using RoBERTa Pre-trained Language Models. In Proceedings of the Second Workshop on Language Technology for Equality, Diversity and Inclusion, pages 276–282, Dublin, Ireland. Association for Computational Linguistics.
 
--   Twenge, J. M. (2019). More time on technology, less happiness? Associations between digital-media use and psychological well-being. Current Directions in Psychological Science, 28(4), 372-379.
+Twenge, J. M. (2019). More time on technology, less happiness? Associations between digital-media use and psychological well-being. Current Directions in Psychological Science, 28(4), 372-379.

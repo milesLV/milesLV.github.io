@@ -220,4 +220,4 @@ SELECT ClientID, isValid
 
 This project demonstrates my ability to: - Design real-world relational databases - Implement automated logic based on given assumptions inside SQL - Manage complex client workflows in a high-traffic system
 
-> **Skills Demonstrated**: MySQL · Relational Database Design · SQL Triggers & Events · Data Lifecycle Management
+> **Skills Demonstrated**: MySQL **·** Relational Database Design **·** SQL Triggers & Events **·** Data Lifecycle Management

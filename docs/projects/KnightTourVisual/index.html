@@ -132,7 +132,7 @@ window.Quarto = {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../cv.html"> 
-<span class="menu-text">Cirriculum Vitae</span></a>
+<span class="menu-text">Resume</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -264,7 +264,7 @@ A =
 \text{Lattice Matrix}
 \end{gather*}
 \]</span></p>
-<p>Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., <span class="math inline">\(A_{1,1} \text{ represents the lattice point } (1,1)\)</span>).</p>
+<p>Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., <span class="math inline">\(A_{1,1}\)</span> represents the lattice point <span class="math inline">\((1,1)\)</span>).</p>
 <p>In order to make a lattice adjacency matrix given <span class="math inline">\(n \times n\)</span> lattices, we will essentially construct an <span class="math inline">\(n^2 \times n^2\)</span> matrix. This comes directly from what we did with the adjacency matrices; every single node was placed both horizontally and vertically in order to show every pair of connections between the nodes. In this case, since our grid has <span class="math inline">\(n \times n = n^2\)</span> lattices, the matrix will be much larger. Essentially, what we are doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer product of two long vectors.</p>
 <p><span class="math display">\[
 \begin{gather*}

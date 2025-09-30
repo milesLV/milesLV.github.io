@@ -178,17 +178,17 @@ Below you will find a Shiny App made for fun using concepts learned in *Linear A
 
 ## Shiny App
 
-<iframe 
-  src="https://mileslv.github.io/KnightsTourShinyApp/" width="100%" height="700">
+<iframe src="https://mileslv.github.io/KnightsTourShinyApp/" width="100%" height="700">
+
 </iframe>
 
 ## The Math Behind the App
 
 ### Adjacency Matrices {#adjacency-matrices}
 
-An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below: 
+An adjacency matrix is a type of matrix used to represent a mathematical graph, as pictured below:
 
-::: {#suppfig-custom} 
+::: {#suppfig-custom}
 ![](images/graphExample.png){fig-align="center" width="226"}
 :::
 
@@ -225,7 +225,7 @@ $$
 \end{gather*}
 $$
 
-Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., $A_{1,1} \text{ represents the lattice point } (1,1)$).
+Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., $A_{1,1}$ represents the lattice point (1,1)).
 
 In order to make a lattice adjacency matrix given $n \times n$ lattices, we will essentially construct an $n^2 \times n^2$ matrix. This comes directly from what we did with the adjacency matrices; every single node was placed both horizontally and vertically in order to show every pair of connections between the nodes. In this case, since our grid has $n \times n = n^2$ lattices, the matrix will be much larger. Essentially, what we are doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer product of two long vectors.
 
@@ -313,7 +313,6 @@ While this project may not be the most practical application, the patterns that 
 In some setups, there is a switch between light squares dominating or dark squares dominating depending on whether the exponent is odd or even. This is a result of the bipartite nature of the board: the board can be divided into two distinct sets of squares (light and dark), and squares within each set are not connected to others of the same set. This property is crucial because it suggests that the eigenvalues of the matrix governing the knight’s movement are symmetric around zero. Specifically, for matrices with this symmetry, we have $\lambda \times m = -\lambda \times m$, which explains why odd and even powers of the matrix lead to such different behaviors. The switch between the odd and even powers of the matrix helps to explain the shifting dominance of the squares. When we raise the matrix to odd powers, the behavior tends to favor one set (either light or dark squares), while raising it to even powers leads to a more balanced or alternating pattern, as the symmetry of the eigenvalues becomes more apparent.
 
 Adjacency matrices can be very powerful tools, helping with topics such as the [spread of infectious disease](https://arxiv.org/abs/2207.02737), [Google's PageRank](https://math.libretexts.org/Bookshelves/Linear_Algebra/Understanding_Linear_Algebra_(Austin)/04%3A_Eigenvalues_and_eigenvectors/4.05%3A_Markov_chains_and_Google's_PageRank_algorithm), and [weather forecast](https://www.researchgate.net/publication/350840280_Applications_of_Markov_Chain_in_Forecast).
-
 
 # References
 
