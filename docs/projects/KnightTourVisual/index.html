@@ -264,7 +264,7 @@ A =
 \text{Lattice Matrix}
 \end{gather*}
 \]</span></p>
-<p>Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., <span class="math inline">\(A_{1,1}\)</span> represents the lattice point <span class="math inline">\((1,1)\)</span>).</p>
+<p>Just as we made an adjacency matrix from a normal graph, we can make a lattice adjacency matrix from a lattice graph. For our purposes, lattice matrices are just regular matrices, but each entry in the matrix represents a lattice point (i.e., <span class="math inline">\(A_{1,1}\)</span> represents the lattice point (1,1)).</p>
 <p>In order to make a lattice adjacency matrix given <span class="math inline">\(n \times n\)</span> lattices, we will essentially construct an <span class="math inline">\(n^2 \times n^2\)</span> matrix. This comes directly from what we did with the adjacency matrices; every single node was placed both horizontally and vertically in order to show every pair of connections between the nodes. In this case, since our grid has <span class="math inline">\(n \times n = n^2\)</span> lattices, the matrix will be much larger. Essentially, what we are doing is making a long vector out of the lattice and then making that long vector 2D by taking the outer product of two long vectors.</p>
 <p><span class="math display">\[
 \begin{gather*}
@@ -292,16 +292,16 @@ A =
 <h3 class="anchored" data-anchor-id="making-the-lattice-adjacency-matrix">Making the Lattice Adjacency Matrix</h3>
 <p>Now that the matrix is made, we can use the 2D to 1D conversion formula: <span class="math inline">\((\text{row} -1) \times \text{row length} + \text{column}\)</span>. This helps streamline the process of actually assigning what squares are adjacent to one another when a knight jumps. For every single cell, we can just calculate the knight moves with a helper function and then assign them a 1 or 0 if they are adjacent.</p>
 <p>The end result looks like this:</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/Image-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/Matrix Image-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="384"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length <span class="math inline">\(n\)</span> that start and end anywhere. For example, by taking the matrix <span class="math inline">\(A\)</span> from before (representative of <a href="#suppfig-custom" class="quarto-xref">Graph&nbsp;1</a>.), computing <span class="math inline">\(A^2\)</span>, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:</p>
+<p>Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix <span class="math inline">\(A\)</span> to some degree <span class="math inline">\(n\)</span>. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length <span class="math inline">\(n\)</span> that start and end anywhere. For example, by taking the matrix <span class="math inline">\(A\)</span> from before (representative of <a href="#suppfig-custom" class="quarto-xref">Graph&nbsp;1</a>), computing <span class="math inline">\(A^2\)</span>, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:</p>
 <p><span class="math display">\[
 \begin{equation*}
 \begin{gathered}

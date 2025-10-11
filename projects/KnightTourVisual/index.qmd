@@ -257,11 +257,12 @@ Now that the matrix is made, we can use the 2D to 1D conversion formula: $(\text
 
 The end result looks like this:
 
-```{r, "Image", echo=FALSE}
+```{r, "Matrix Image", echo=FALSE, fig.align='center', fig.width=4, fig.height=3}
+par(mar = c(1.8, 1.8, 1.8, 1.8))
 image(makeLatticeAdjMatrix())
 ```
 
-Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length $n$ that start and end anywhere. For example, by taking the matrix $A$ from before (representative of [Graph -@suppfig-custom].), computing $A^2$, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:
+Now, the reason why we wanted to go through all this trouble was because adjacency matrices are very useful for showing future movement from any starting point. This is done as easily as just exponentiating the adjacency matrix $A$ to some degree $n$. In doing so, from the basic properties of matrix multiplication, we can determine all of the possible paths of length $n$ that start and end anywhere. For example, by taking the matrix $A$ from before (representative of [Graph -@suppfig-custom]), computing $A^2$, and zooming in on the results for the paths that end at node 2 after 2 walks, we can see this clearly:
 
 $$
 \begin{equation*}
