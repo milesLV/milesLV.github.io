@@ -42,7 +42,7 @@ Hello! My name is Miles Libbey (he/him). I’m a recent Macalester College gradu
 I believe, like the authors of *Freakonomics*, that the world is full of data and questions to be explored, and with the right tools and methods, we can discover evidence for surprising facts in a wide range of fields. This curiosity is what led me to study Data Science in the first place—its promise to uncover hidden stories within data through cleaning, analysis, and visualization.
 
 
-I have a long history of working with non-profit organizations, beginning in high school where I achieved my goal of completing 168 hours (a week’s worth of time) of volunteer work, to recently working as a Development Intern at The Arc Minnesota. Ultimately, my goal is to hone my data analytics skills early in my career, so I can go back into the non-profit world and help to create real impact in any way I can.
+I have a long history of working with non-profit organizations, beginning in high school where I achieved my goal of completing 168 hours (a week’s worth of time) of volunteer work, to recently working as a Development Intern at The Arc Minnesota. Ultimately, my goal is to hone my data analytics skills early in my career, so I can go back into the non-profit world and help create real impact in any way I can.
 
 
 My resume can be viewed [here](cv.qmd)

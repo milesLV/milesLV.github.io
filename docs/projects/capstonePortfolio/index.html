@@ -8,7 +8,7 @@
 
 <meta name="author" content="Miles Libbey V">
 
-<title>Housing Status Changes While in Substance Abuse Treatment (Senior Capstone) – Miles Libbey V</title>
+<title>Housing Status Changes While in Substance Abuse Treatment (Senior Capstone Project) – Miles Libbey V</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -196,7 +196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Housing Status Changes While in Substance Abuse Treatment (Senior Capstone)</h1>
+<h1 class="title">Housing Status Changes While in Substance Abuse Treatment (Senior Capstone Project)</h1>
   <div class="quarto-categories">
     <div class="quarto-category">University</div>
     <div class="quarto-category">R</div>
@@ -227,13 +227,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="project-overview" class="level1">
 <h1>Project Overview</h1>
-<p>This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: <strong>What distinguishes people whose housing status changes from those whose does not?</strong></p>
+<p>This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focused on two groups: those unhoused at admission and those in independent living. The central question was: <strong>What distinguishes people whose housing status changes from those whose housing does not?</strong></p>
 <p>I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.</p>
 </section>
 <section id="background-motivation" class="level1">
 <h1>Background &amp; Motivation</h1>
-<p>This project was completed as part of the <em>Projects in Data Science</em> capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.</p>
-<p>Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1&gt; year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly <a href="#change-diagram" style="text-decoration:none">*</a>40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.</p>
+<p>This project was completed as part of the <em>Projects in Data Science</em> capstone course, with two other peer students. Each of us selected a quality of life predictor (housing, employment, or substance use frequency) and investigated how each predictor changed under the guidance of two experts with experience working with substance abuse or similar issues.</p>
+<p>Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote housing stability. For example, while “chronically homeless” (the term used for people unhoused &gt;1 year(s) and with substance issues) pessimistically implies permanence, the exploratory plot below shows nearly <a href="#change-diagram" style="text-decoration:none">*</a>40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change their housing status, while others remain the same? This project addresses that question for both groups.</p>
 <figure id="change-diagram" style="text-align: center;" class="figure">
 <img src="images/changeDiagram.png" alt="How clients' housing changes from admission to a substance abuse treatment facility (top) to when they are discharged (bottom)." width="750" class="figure-img">
 <figcaption>
@@ -246,14 +246,14 @@ How clients’ housing changes from Admission (top) to Discharge (bottom)
 <ul>
 <li><strong>Source:</strong> TEDS‑D 2021 (SAMHSA)</li>
 <li><strong>Scope:</strong> ~370,000 anonymized client records, 76 variables (broadly can be categorized as demographic, treatment related (what services the clients received), and non-treatment related (answers that might come up in an intake form or police database – diagnoses, prior treatment, age of first substance use, etc.))</li>
-<li><strong>Inclusion criteria:</strong> Age 12+, completed treatment episode, public facilities only, all states excluding Delaware, Idaho, and Oregon</li>
+<li><strong>Inclusion criteria:</strong> Age 12+, completed treatment episode, public facilities only, all states, excluding Delaware, Idaho, and Oregon</li>
 </ul>
 </section>
 <section id="classification-dimension-reduction-tools-methodology" class="level1">
 <h1>Classification + Dimension Reduction Tools (Methodology)</h1>
-<p>To analyze, I used 2 complementary tools:</p>
+<p>To analyze the dataset, I used 2 complementary tools:</p>
 <ul>
-<li><p><strong>Classification (CatBoost)</strong> — Supervised learning to classify whether a person <em>changed</em> versus <em>remained</em> in housing status between admission and discharge.</p></li>
+<li><p><strong>Classification (CatBoost)</strong> — Supervised learning to classify whether a person <em>changed</em> versus <em>remained</em> in their current housing status between admission and discharge.</p></li>
 <li><p><strong>Dimensional Reduction (MCA)</strong> — Dimensional reduction to summarize multivariate categorical structure and highlight which categorical levels pull observations toward changing or remaining.</p></li>
 </ul>
 <p>Because unhoused and housed individuals differ significantly, 2 separate models were trained for clearer insights.</p>
@@ -454,7 +454,7 @@ CatBoost Independent Living Model Scaffolding
 <li><p><strong>Effective treatment</strong> – Longer stays, residential programs, and self-help participation improve outcomes.</p></li>
 <li><p><strong>Age minimal</strong> – Except ages 18–20, age has little effect.</p></li>
 <li><p><strong>Psychiatric disorders negligible</strong> – Only substance use disorders impact housing.</p></li>
-<li><p><strong>Certain substances harmful</strong> – Some drugs, especially among initially housed individuals, increase risk.</p></li>
+<li><p><strong>Certain substances are harmful</strong> – Some drugs, especially among initially housed individuals, increase risk.</p></li>
 </ul>
 </section>
 </section>
@@ -499,7 +499,7 @@ CatBoost Independent Living Model Scaffolding
 <p>Brubaker, M. D., Amatea, E. A., Torres-Rivera, E., Miller, M. D., &amp; Nabors, L. (2013). Barriers and Supports to Substance Abuse Service Use Among Homeless Adults. Journal of Addictions &amp; Offender Counseling, 34(2), 81–98. <a href="https://doi.org/10.1002/j.2161-1874.2013.00017.x" class="uri">https://doi.org/10.1002/j.2161-1874.2013.00017.x</a></p>
 <p>Lundberg, S. (2018). An introduction to explainable AI with Shapley values — SHAP latest documentation. Read the Docs. <a href="https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html" class="uri">https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html</a></p>
 <p>Nicholls, M. J., &amp; Urada, L. A. (2021). Homelessness and polysubstance use: A qualitative study on recovery and treatment access solutions around an urban library in Southern California, USA. Health &amp; Social Care in the Community, 30(1). <a href="https://doi.org/10.1111/hsc.13424" class="uri">https://doi.org/10.1111/hsc.13424</a></p>
-<p>Substance Abuse / Chemical Dependency. (2024). John Hopkins Medicine. <a href="https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency" class="uri">https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency</a></p>
+<p>Substance Abuse / Chemical Dependency. (2024). Johns Hopkins Medicine. <a href="https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency" class="uri">https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency</a></p>
 <p>Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <a href="https://www.samhsa.gov/data/" class="uri">https://www.samhsa.gov/data/</a>.</p>
 <p>US Department of Housing and Urban Development. (2015). Definition of Chronic Homelessness. HUD Exchange. <a href="https://www.hudexchange.info/homelessness-assistance/coc-esg-virtual-binders/coc-esg-homeless-eligibility/definition-of-chronic-homelessness/" class="uri">https://www.hudexchange.info/homelessness-assistance/coc-esg-virtual-binders/coc-esg-homeless-eligibility/definition-of-chronic-homelessness/</a></p>
 <hr>

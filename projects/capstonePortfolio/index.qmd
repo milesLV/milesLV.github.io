@@ -1,5 +1,5 @@
 ---
-title: "Housing Status Changes While in Substance Abuse Treatment (Senior Capstone)"
+title: "Housing Status Changes While in Substance Abuse Treatment (Senior Capstone Project)"
 author: "Miles Libbey V"
 image: icon2.png
 categories: 
@@ -14,15 +14,15 @@ format:
 
 # Project Overview
 
-This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focus on two groups: those unhoused at admission and those in independent living. The central question was: **What distinguishes people whose housing status changes from those whose does not?**
+This project examines how individuals completing substance abuse treatment change—or fail to change—their housing status between admission and discharge. Using the national TEDS-D 2021 dataset, I focused on two groups: those unhoused at admission and those in independent living. The central question was: **What distinguishes people whose housing status changes from those whose housing does not?**
 
 I compared individuals who remained unhoused with those who transitioned into independent living, and also noting the small subset who became unhoused after living independently. Analyses were performed in R, with Python used for modeling (CatBoost, SHAP) and Tableau for visualization.
 
 # Background & Motivation
 
-This project was completed as part of the *Projects in Data Science* capstone course as part of a group of 3. Each of us selected a quality of life predictor (housing, employment, and substance use frequency) and investigated how each changed under the guidance of 2 experts with experience in working with substance abuse or similar issues.
+This project was completed as part of the *Projects in Data Science* capstone course, with two other peer students. Each of us selected a quality of life predictor (housing, employment, or substance use frequency) and investigated how each predictor changed under the guidance of two experts with experience working with substance abuse or similar issues.
 
-Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote stability. For example, while “chronically homeless” (the term for people unhoused 1> year(s) and have substance issues) pessimistically implies permanence, the exploratory plot below shows nearly <a href="#change-diagram" style="text-decoration:none">*</a>40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change while others remain the same? This project addresses that question for both groups.
+Identifying characteristics linked to positive housing transitions can guide policymakers and providers toward interventions that promote housing stability. For example, while “chronically homeless” (the term used for people unhoused >1 year(s) and with substance issues) pessimistically implies permanence, the exploratory plot below shows nearly <a href="#change-diagram" style="text-decoration:none">*</a>40% of unhoused individuals in the dataset transitioned to housing (HUD, 2015). Why do some change their housing status, while others remain the same? This project addresses that question for both groups.
 
 <figure id="change-diagram" style="text-align: center;">
   <img src="images/changeDiagram.png" 
@@ -37,13 +37,13 @@ Identifying characteristics linked to positive housing transitions can guide pol
 
 -   **Source:** TEDS‑D 2021 (SAMHSA)
 -   **Scope:** \~370,000 anonymized client records, 76 variables (broadly can be categorized as demographic, treatment related (what services the clients received), and non-treatment related (answers that might come up in an intake form or police database -- diagnoses, prior treatment, age of first substance use, etc.))
--   **Inclusion criteria:** Age 12+, completed treatment episode, public facilities only, all states excluding Delaware, Idaho, and Oregon
+-   **Inclusion criteria:** Age 12+, completed treatment episode, public facilities only, all states, excluding Delaware, Idaho, and Oregon
 
 # Classification + Dimension Reduction Tools (Methodology)
 
-To analyze, I used 2 complementary tools:
+To analyze the dataset, I used 2 complementary tools:
 
--   **Classification (CatBoost)** — Supervised learning to classify whether a person *changed* versus *remained* in housing status between admission and discharge.
+-   **Classification (CatBoost)** — Supervised learning to classify whether a person *changed* versus *remained* in their current housing status between admission and discharge.
 
 -   **Dimensional Reduction (MCA)** — Dimensional reduction to summarize multivariate categorical structure and highlight which categorical levels pull observations toward changing or remaining.
 
@@ -208,7 +208,7 @@ Drug type significantly influences likelihood of independent living at discharge
 
 -   **Psychiatric disorders negligible** – Only substance use disorders impact housing.
 
--   **Certain substances harmful** – Some drugs, especially among initially housed individuals, increase risk.
+-   **Certain substances are harmful** – Some drugs, especially among initially housed individuals, increase risk.
 
 # Who Were the People Not Included?
 
@@ -230,7 +230,12 @@ Drug type significantly influences likelihood of independent living at discharge
 
 # Skills 
 
-This project demonstrates my ability to: - Clean and structure large-scale categorical datasets for analysis - Build and interpret machine learning classification models (CatBoost) - Apply dimensionality reduction techniques (MCA) to uncover patterns - Translate statistical results into actionable insights in a social impact domain - Communicate technical findings effectively to both technical and non-technical audiences
+This project demonstrates my ability to: 
+- Clean and structure large-scale categorical datasets for analysis 
+- Build and interpret machine learning classification models (CatBoost) 
+- Apply dimensionality reduction techniques (MCA) to uncover patterns 
+- Translate statistical results into actionable insights in a social impact domain 
+- Communicate technical findings effectively to both technical and non-technical audiences
 
 > **Skills Demonstrated:** R **·** Python **·**  Tableau **·** Data Wrangling **·** Machine Learning (CatBoost) **·** SHAP Interpretation **·** Dimensionality Reduction (MCA) **·** Data Visualization **·** Statistical Analysis **·** Research Communication
 
@@ -246,7 +251,7 @@ Lundberg, S. (2018). An introduction to explainable AI with Shapley values — S
 
 Nicholls, M. J., & Urada, L. A. (2021). Homelessness and polysubstance use: A qualitative study on recovery and treatment access solutions around an urban library in Southern California, USA. Health & Social Care in the Community, 30(1). <https://doi.org/10.1111/hsc.13424>
 
-Substance Abuse / Chemical Dependency. (2024). John Hopkins Medicine. <https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency>
+Substance Abuse / Chemical Dependency. (2024). Johns Hopkins Medicine. <https://www.hopkinsmedicine.org/health/conditions-and-diseases/substance-abuse-chemical-dependency>
 
 Substance Abuse and Mental Health Services Administration. (2023). Treatment Episode Data Set Discharges (TEDS-D) 2021: Public Use File (PUF) Codebook. Rockville, MD: Center for Behavioral Health Statistics and Quality, Substance Abuse and Mental Health Services Administration. Retrieved from <https://www.samhsa.gov/data/>.
 

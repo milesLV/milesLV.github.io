@@ -9,7 +9,7 @@ categories:
 
 ## Project Overview
 
-The objective of the project was to design and implement a MySQL database that could, in theory, serve as the backbone of Madrid’s metro system—automatically handling ticket dispensing and decommissioning (upon expiration), calculating fare prices based on the client’s city zone and discount eligibility, and incorporating a detailed schema and features derived from a set of assumptions. 
+The objective of this project was to design and implement a MySQL database that could, in theory, serve as the backbone of Madrid’s metro system—automatically handling ticket dispensing and decommissioning (upon expiration), calculating fare prices based on the client’s city zone and discount eligibility, and incorporating a detailed schema and features derived from a set of assumptions. 
 
 <figure style="text-align: center;">
   <img src="icon.png" width="418" alt="Map of the Madrid metro lines">
@@ -218,6 +218,9 @@ SELECT ClientID, isValid
 
 ## Skills
 
-This project demonstrates my ability to: - Design real-world relational databases - Implement automated logic based on given assumptions inside SQL - Manage complex client workflows in a high-traffic system
+This project demonstrates my ability to:
+- Design real-world relational databases 
+- Implement automated logic based on given assumptions inside SQL 
+- Manage complex client workflows in a high-traffic system
 
 > **Skills Demonstrated**: MySQL **·** Relational Database Design **·** SQL Triggers & Events **·** Data Lifecycle Management

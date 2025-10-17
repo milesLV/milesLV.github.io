@@ -11,11 +11,11 @@ categories:
 
 ## Overview
 
-This project started as a project as part of the course, "Language in Social Media: A Computational Linguistics Perspective" taught by Zuoyu Tian, who was a great source of support in this project. The group consisted of Elan Levin, Sylvain Zong-Nabia, and myself. Our team set out to explore a pressing question:
+This project was initially part of the course, “Language in Social Media: A Computational Linguistics Perspective” taught by Zuoyu Tian, who was a great source of support in this project. The group consisted of Elan Levin, Sylvain Zong-Nabia, and myself. Our team set out to explore a pressing question:
 
-"Is loneliness becoming normalized among young people in the digital age?"
+**"Is loneliness becoming normalized among young people in the digital age?"**
 
-We combined computational methods, sentiment analysis, and topic modeling to analyze thousands of social media posts from Reddit. Our findings shed light on how loneliness is not only experienced but also culturally discussed and potentially normalized. I went on individually to expand on the project and refine some of the aspects we didn't have time to address due to our heavy workloads in the final months of university.
+We combined computational methods, sentiment analysis, and topic modeling to analyze thousands of social media posts from Reddit. Our findings shed light on how loneliness is not only experienced but also culturally discussed and potentially normalized. I went on independently to expand on the project scope and refine some of the aspects we didn’t have time to address due to our heavy workloads in the final months of university.
 
 ------------------------------------------------------------------------
 
@@ -105,9 +105,9 @@ We combined **human annotation** and **LLM-assisted classification**:
 
 Guntuku, S. C., Yaden, D. B., Kern, M. L., Ungar, L. H., & Eichstaedt, J. C. (2017). Detecting depression and mental illness on social media: an integrative review. Current Opinion in Behavioral Sciences, 18, 43-49.
 
-Jiang, Y., Jiang, Y., Leqi, L., & Winkielman, P. (2022). Many Ways to Be Lonely: Fine-Grained Characterization of Loneliness and Its Potential Changes in COVID-19. Proceedings of the International AAAI Conference on Web and Social Media, 16(1), 405-416. Retrieved from <https://ojs.aaai.org/index.php/ICWSM/article/view/19302>
+Jiang, Y., Leqi, L., & Winkielman, P. (2022). Many Ways to Be Lonely: Fine-Grained Characterization of Loneliness and Its Potential Changes in COVID-19. Proceedings of the International AAAI Conference on Web and Social Media, 16(1), 405-416. Retrieved from <https://ojs.aaai.org/index.php/ICWSM/article/view/19302>
 
-Khalaf, A. M., Alubied, A. A., Khalaf, A. M., Rifaey, A. A., Alubied, A., & Rifaey, A. (2023). The impact of social media on the mental health of adolescents and young adults: a systematic review. Cureus, 15(8).
+Khalaf, A. M., Alubied, A., & Rifaey, A. A. (2023). The impact of social media on the mental health of adolescents and young adults: a systematic review. Cureus, 15(8).
 
 Koh, J. Y., McAleer, S., Fried, D., & Salakhutdinov, R. (2024). Tree search for language model agents. arXiv preprint arXiv:2407.01476.
 
