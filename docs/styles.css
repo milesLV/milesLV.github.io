@@ -172,3 +172,59 @@
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+/* ------ NAVBAR ADJUSTMENT ------ */
+.navbar {
+  padding-top: 1rem;      /* Increase vertical space */
+  padding-bottom: 1rem;
+  font-size: 1.2rem;      /* Base font size for links */
+}
+
+/* Make the link text bigger */
+.navbar-nav .nav-link {
+  font-size: 1.2rem;
+  font-weight: 600;       /* Optional: make text bolder */
+}
+
+/* Optional: increase brand/logo size */
+.navbar-brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* Optional: adjust spacing between nav items */
+.navbar-nav .nav-item {
+  margin-right: 1rem;
+}
+
+/* ------ TITLE BANNER ------*/
+.quarto-title-block .quarto-title-banner {
+  height: 80px;              /* or whatever size you want */
+  background-size: cover;
+  background-position: center;
+  display: flex;              /* enables vertical centering */
+  flex-direction: column;
+  justify-content: center;    /* centers title vertically */
+  padding: 0 1.5rem;          /* small side padding */
+}
+
+/* Reduce spacing above and below the title banner */
+.quarto-title-block.quarto-title-banner,
+.quarto-title-banner {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0.5em !important;
+    padding-bottom: 0.5em !important;
+}
+
+/* Reduce spacing between title block and main content */
+.quarto-container#quarto-content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Optional: shrink extra spacing inside the header */
+#title-block-header h1.title {
+    margin-top: 0 !important;
+    margin-bottom: 0.25em !important;
+}
